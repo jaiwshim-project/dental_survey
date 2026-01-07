@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>임영일 원장 - 2번 진단 결과</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="type-theme">
+    <div class="container">
+        <div class="result-header">
+            <h1 style="font-size: 1.8rem; margin-bottom: 8px;">화이트서울치과 임영일 원장</h1>
+            <p style="font-size: 0.95rem; opacity: 0.85; margin-bottom: 15px;">대전 중구 | 의사 1명, 간호사 1명, 상담사 1명</p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: #fbbf24; margin: 15px 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">2. 원장 스타일 5유형 진단 결과</p>
+            <p style="font-size: 0.95rem; margin-top: 8px; opacity: 0.85;">진단 일자: 2026년 1월 7일</p>
+        </div>
+
+        <!-- 분석 결과 개요 -->
+        <div id="diagnosisSummaryBox" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+            <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+            <p id="diagnosisSummary" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+        </div>
+
+        <main>
+            <!-- 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+
+                <!-- 레이더 차트 -->
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <!-- 점수 카드 -->
+                <div class="score-summary" id="scoreSummary"></div>
+            </div>
+
+            <!-- 주 유형 -->
+            <div class="report-section">
+                <h2>주 유형</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryTypeName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryTypeDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics" style="line-height: 1.8;"></ul>
+
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 유형 -->
+            <div class="report-section">
+                <h2>보조 유형</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryTypeName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryTypeDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer"></div>
+            </div>
+
+            <!-- 액션 버튼 -->
+            <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn-primary" onclick="window.print()" style="flex: 1; min-width: 200px;">
+                    결과 출력하기
+                </button>
+            </div>
+        </main>
+
+        <footer style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+            <p style="text-align: center; color: #6b7280;">&copy; 2026 치과병원 컨설팅 솔루션 | 2. 원장 스타일 진단 시스템</p>
+        </footer>
+    </div>
+
+    <script src="js/2.data-type.js"></script>
+    <script src="js/2.analysis-type.js"></script>
+    <script>
+        // 테스트 데이터 설정
+        const testAnswers = [
+            "25", "45", "23", "51", "53", "52", "43", "45", "23", "42",
+            "45", "15", "45", "45", "23", "14", "14", "45", "25", "25",
+            "14", "24", "42", "45", "15"
+        ];
+
+        // sessionStorage에 임시 데이터 설정
+        sessionStorage.setItem('clinicName', '화이트서울치과');
+        sessionStorage.setItem('directorName', '임영일');
+        sessionStorage.setItem('region', '대전 중구');
+        sessionStorage.setItem('doctorCount', '1');
+        sessionStorage.setItem('nurseCount', '1');
+        sessionStorage.setItem('counselorCount', '1');
+        sessionStorage.setItem('diagnosisDate', '2026년 1월 7일');
+        sessionStorage.setItem('answers', JSON.stringify(testAnswers));
+
+        // 진단 결과 생성
+        document.addEventListener('DOMContentLoaded', function() {
+            const answers = testAnswers;
+            const directorName = '임영일';
+
+            // 답변 분석
+            const result = analyzeAnswers(answers);
+
+            // 결과 표시
+            displaySummary(result.analysis, directorName);
+            displayRadarChart(result);
+            displayScoreSummary(result);
+            displayPrimaryType(result.analysis.primary);
+            displaySecondaryType(result.analysis.secondary);
+            displayProposal(result.analysis);
+            displayRoadmap(result.analysis);
+
+            console.log('진단 결과:', result);
+        });
+    </script>
+    <script src="js/2.report-type.js"></script>
+</body>
+</html>

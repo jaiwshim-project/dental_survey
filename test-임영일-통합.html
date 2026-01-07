@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>임영일 원장 - 통합 진단 결과</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .diagnosis-separator {
+            margin: 60px 0;
+            padding: 30px 0;
+            border-top: 3px dashed #e5e7eb;
+            text-align: center;
+        }
+        .diagnosis-separator-text {
+            display: inline-block;
+            background: white;
+            padding: 10px 30px;
+            color: #6b7280;
+            font-weight: 600;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: -45px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 병원 정보 헤더 -->
+        <div class="result-header" style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 2rem; margin-bottom: 10px;">화이트서울치과 임영일 원장</h1>
+            <p style="font-size: 1rem; opacity: 0.85; margin-bottom: 10px;">대전 중구 | 의사 1명, 간호사 1명, 상담사 1명</p>
+            <p style="font-size: 0.95rem; opacity: 0.85;">진단 일자: 2026년 1월 7일</p>
+        </div>
+
+        <!-- 1번 진단 결과 -->
+        <div id="diagnosis1Section">
+            <div class="revenue-theme" style="padding: 20px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; margin-bottom: 30px;">
+                <p style="font-size: 1.5rem; font-weight: bold; color: #92400e; text-align: center; margin: 0;">💰 1. 병원 수익 단계별 진단 결과</p>
+            </div>
+
+            <!-- 진단 결과 개요 -->
+            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+                <p id="diagnosisSummary1" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+            </div>
+
+            <!-- 진단 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart1"></canvas>
+                </div>
+                <div class="score-summary" id="scoreSummary1"></div>
+            </div>
+
+            <!-- 주 단계 -->
+            <div class="report-section">
+                <h2>주 단계</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryStageName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryStageDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics1" style="line-height: 1.8;"></ul>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords1" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 단계 -->
+            <div class="report-section">
+                <h2>보조 단계</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryStageName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryStageDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics1" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 방향 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage1" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer1"></div>
+            </div>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="diagnosis-separator">
+            <div class="diagnosis-separator-text">⬇️ 2번 진단 결과 ⬇️</div>
+        </div>
+
+        <!-- 2번 진단 결과 -->
+        <div id="diagnosis2Section">
+            <div class="type-theme" style="padding: 20px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 12px; margin-bottom: 30px;">
+                <p style="font-size: 1.5rem; font-weight: bold; color: #6b21a8; text-align: center; margin: 0;">🏥 2. 원장 스타일 5유형 진단 결과</p>
+            </div>
+
+            <!-- 분석 결과 개요 -->
+            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+                <p id="diagnosisSummary2" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+            </div>
+
+            <!-- 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart2"></canvas>
+                </div>
+                <div class="score-summary" id="scoreSummary2"></div>
+            </div>
+
+            <!-- 주 유형 -->
+            <div class="report-section">
+                <h2>주 유형</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryTypeName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryTypeDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics2" style="line-height: 1.8;"></ul>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords2" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 유형 -->
+            <div class="report-section">
+                <h2>보조 유형</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryTypeName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryTypeDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics2" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage2" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer2"></div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+            <p style="text-align: center; color: #6b7280;">&copy; 2026 치과병원 컨설팅 솔루션</p>
+        </footer>
+    </div>
+
+    <script src="js/1.data-revenue.js"></script>
+    <script src="js/1.analysis-revenue.js"></script>
+    <script src="js/2.data-type.js"></script>
+    <script src="js/2.analysis-type.js"></script>
+    <script>
+        // 1번 진단 테스트 데이터
+        const testAnswers1 = [
+            "24", "45", "24", "23", "15", "24", "51", "34", "54", "45", "23", "45"
+        ];
+
+        // 2번 진단 테스트 데이터
+        const testAnswers2 = [
+            "25", "45", "23", "51", "53", "52", "43", "45", "23", "42",
+            "45", "15", "45", "45", "23", "14", "14", "45", "25", "25",
+            "14", "24", "42", "45", "15"
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const directorName = '임영일';
+            const clinicName = '화이트서울치과';
+
+            // ========== 1번 진단 결과 ==========
+            const result1 = analyzeAnswers(testAnswers1);
+
+            // 개요
+            let summary1 = `<strong>${directorName} 원장님의 병원</strong>은 `;
+            summary1 += `<strong style="color: #2563eb;">${result1.analysis.primary.fullName}(${result1.analysis.primary.stage}형, ${result1.analysis.primary.score}점)</strong>을 주 단계로, `;
+            summary1 += `<strong style="color: #10b981;">${result1.analysis.secondary.fullName}(${result1.analysis.secondary.stage}형, ${result1.analysis.secondary.score}점)</strong>을 보조 단계로 가지고 있습니다.`;
+            document.getElementById('diagnosisSummary1').innerHTML = summary1;
+
+            // 레이더 차트
+            const ctx1 = document.getElementById('radarChart1').getContext('2d');
+            const labels1 = ['1형\n정체·감소', '2형\n유지·불안정', '3형\n원장과부하', '4형\n안정·확장', '5형\n브랜드형'];
+            const primaryIndex1 = result1.scores.indexOf(Math.max(...result1.scores));
+            const sortedScores1 = [...result1.scores].sort((a, b) => b - a);
+            const secondaryIndex1 = result1.scores.indexOf(sortedScores1[1]);
+
+            const pointColors1 = result1.scores.map((score, i) => {
+                if (i === primaryIndex1) return '#2563eb';
+                if (i === secondaryIndex1) return '#10b981';
+                return '#9ca3af';
+            });
+
+            const pointSizes1 = result1.scores.map((score, i) => {
+                if (i === primaryIndex1 || i === secondaryIndex1) return 6;
+                return 4;
+            });
+
+            new Chart(ctx1, {
+                type: 'radar',
+                data: {
+                    labels: labels1,
+                    datasets: [{
+                        label: '수익 단계별 점수',
+                        data: result1.scores,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        pointBackgroundColor: pointColors1,
+                        pointBorderColor: pointColors1,
+                        pointBorderWidth: 2,
+                        pointRadius: pointSizes1,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '병원 수익 단계별 5유형 분석',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: Math.max(...result1.scores) + 5,
+                            ticks: { stepSize: 5 }
+                        }
+                    }
+                }
+            });
+
+            // 점수 요약
+            let html1 = '';
+            result1.analysis.allScores.forEach((item, index) => {
+                const isPrimary = index === 0;
+                const isSecondary = index === 1;
+                const className = isPrimary ? 'primary' : (isSecondary ? 'secondary' : '');
+                html1 += `
+                    <div class="score-item ${className}">
+                        <div class="score-label">${item.stage}형 - ${item.name}</div>
+                        <div class="score-value">${item.score}점</div>
+                        ${isPrimary ? '<div style="margin-top: 3px; color: #2563eb; font-weight: bold; font-size: 0.7rem;">주 단계</div>' : ''}
+                        ${isSecondary ? '<div style="margin-top: 3px; color: #10b981; font-weight: bold; font-size: 0.7rem;">보조 단계</div>' : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('scoreSummary1').innerHTML = html1;
+
+            // 주/보조 단계
+            document.getElementById('primaryStageName').textContent = `${result1.analysis.primary.stage}형 - ${result1.analysis.primary.fullName} (${result1.analysis.primary.score}점)`;
+            document.getElementById('primaryStageDescription').textContent = result1.analysis.primary.description;
+            document.getElementById('primaryCharacteristics1').innerHTML = result1.analysis.primary.characteristics.map(c => `<li>${c}</li>`).join('');
+            document.getElementById('primaryKeywords1').innerHTML = result1.analysis.primary.proposalKeywords.map(k => `
+                <span style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 10px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 500; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); display: inline-block;">
+                    ${k}
+                </span>
+            `).join('');
+
+            document.getElementById('secondaryStageName').textContent = `${result1.analysis.secondary.stage}형 - ${result1.analysis.secondary.fullName} (${result1.analysis.secondary.score}점)`;
+            document.getElementById('secondaryStageDescription').textContent = result1.analysis.secondary.description;
+            document.getElementById('secondaryCharacteristics1').innerHTML = result1.analysis.secondary.characteristics.map(c => `<li>${c}</li>`).join('');
+
+            // 제안 및 로드맵
+            document.getElementById('proposalMessage1').innerHTML = `${result1.analysis.primary.fullName}에서 더 나은 단계로 발전하기 위한 맞춤형 솔루션을 제안합니다.`;
+
+            const roadmap1 = [
+                { step: 1, title: '현황 진단 및 분석', content: '현재 병원의 수익 구조와 운영 현황을 정확히 파악합니다.' },
+                { step: 2, title: '핵심 솔루션 도입', content: '병원 상황에 맞는 맞춤형 솔루션을 단계적으로 도입합니다.' },
+                { step: 3, title: '효과 측정 및 최적화', content: '도입한 솔루션의 효과를 측정하고 지속적으로 최적화합니다.' },
+                { step: 4, title: '지속 가능한 성장 체계 구축', content: '안정적이고 지속 가능한 수익 구조를 확립합니다.' }
+            ];
+
+            let roadmapHTML1 = '';
+            roadmap1.forEach(step => {
+                roadmapHTML1 += `
+                    <div style="margin-bottom: 20px; padding: 20px 25px; background: linear-gradient(135deg, #f9fafb, #ffffff); border-left: 5px solid #2563eb; border-radius: 10px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);">
+                        <h3 style="color: #2563eb; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem;">
+                            <span style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 6px 14px; border-radius: 50%; margin-right: 12px; font-size: 0.95rem; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);">
+                                ${step.step}
+                            </span>
+                            ${step.title}
+                        </h3>
+                        <p style="margin-left: 50px; line-height: 1.8; color: #4b5563; font-size: 1.05rem;">
+                            ${step.content}
+                        </p>
+                    </div>
+                `;
+            });
+            document.getElementById('roadmapContainer1').innerHTML = roadmapHTML1;
+
+            // ========== 2번 진단 결과 ==========
+            const result2 = analyzeAnswers(testAnswers2);
+
+            // 개요
+            let summary2 = `<strong>${directorName} 원장님</strong>은 `;
+            summary2 += `<strong style="color: #2563eb;">${result2.analysis.primary.fullName}(${result2.analysis.primary.type}형, ${result2.analysis.primary.score}점)</strong>을 주 유형으로, `;
+            summary2 += `<strong style="color: #10b981;">${result2.analysis.secondary.fullName}(${result2.analysis.secondary.type}형, ${result2.analysis.secondary.score}점)</strong>을 보조 유형으로 가지고 계십니다.`;
+            document.getElementById('diagnosisSummary2').innerHTML = summary2;
+
+            // 레이더 차트
+            const ctx2 = document.getElementById('radarChart2').getContext('2d');
+            const labels2 = ['A형\n결단·속도', 'B형\n구조·안정', 'C형\n팀·교육', 'D형\n수익·경영', 'E형\n환자·신뢰'];
+            const scoresArray2 = [result2.scores[1], result2.scores[2], result2.scores[3], result2.scores[4], result2.scores[5]];
+            const primaryIndex2 = scoresArray2.indexOf(Math.max(...scoresArray2));
+            const sortedScores2 = [...scoresArray2].sort((a, b) => b - a);
+            const secondaryIndex2 = scoresArray2.indexOf(sortedScores2[1]);
+
+            const pointColors2 = scoresArray2.map((score, i) => {
+                if (i === primaryIndex2) return '#8b5cf6';
+                if (i === secondaryIndex2) return '#10b981';
+                return '#9ca3af';
+            });
+
+            const pointSizes2 = scoresArray2.map((score, i) => {
+                if (i === primaryIndex2 || i === secondaryIndex2) return 6;
+                return 4;
+            });
+
+            new Chart(ctx2, {
+                type: 'radar',
+                data: {
+                    labels: labels2,
+                    datasets: [{
+                        label: '원장 스타일 점수',
+                        data: scoresArray2,
+                        fill: true,
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        borderColor: '#8b5cf6',
+                        borderWidth: 2,
+                        pointBackgroundColor: pointColors2,
+                        pointBorderColor: pointColors2,
+                        pointBorderWidth: 2,
+                        pointRadius: pointSizes2,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '원장 스타일 5유형 분석',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: Math.max(...scoresArray2) + 5,
+                            ticks: { stepSize: 5 }
+                        }
+                    }
+                }
+            });
+
+            // 점수 요약
+            let html2 = '';
+            result2.analysis.allScores.forEach((item, index) => {
+                const isPrimary = index === 0;
+                const isSecondary = index === 1;
+                const className = isPrimary ? 'primary' : (isSecondary ? 'secondary' : '');
+                html2 += `
+                    <div class="score-item ${className}">
+                        <div class="score-label">${item.type}형 - ${item.name}</div>
+                        <div class="score-value">${item.score}점</div>
+                        ${isPrimary ? '<div style="margin-top: 3px; color: #2563eb; font-weight: bold; font-size: 0.7rem;">주 유형</div>' : ''}
+                        ${isSecondary ? '<div style="margin-top: 3px; color: #10b981; font-weight: bold; font-size: 0.7rem;">보조 유형</div>' : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('scoreSummary2').innerHTML = html2;
+
+            // 주/보조 유형
+            document.getElementById('primaryTypeName').textContent = `${result2.analysis.primary.type}형 - ${result2.analysis.primary.fullName} (${result2.analysis.primary.score}점)`;
+            document.getElementById('primaryTypeDescription').textContent = result2.analysis.primary.description;
+            document.getElementById('primaryCharacteristics2').innerHTML = result2.analysis.primary.characteristics.map(c => `<li>${c}</li>`).join('');
+            document.getElementById('primaryKeywords2').innerHTML = result2.analysis.primary.proposalKeywords.map(k => `
+                <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 10px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 500; box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3); display: inline-block;">
+                    ${k}
+                </span>
+            `).join('');
+
+            document.getElementById('secondaryTypeName').textContent = `${result2.analysis.secondary.type}형 - ${result2.analysis.secondary.fullName} (${result2.analysis.secondary.score}점)`;
+            document.getElementById('secondaryTypeDescription').textContent = result2.analysis.secondary.description;
+            document.getElementById('secondaryCharacteristics2').innerHTML = result2.analysis.secondary.characteristics.map(c => `<li>${c}</li>`).join('');
+
+            // 제안 및 로드맵
+            document.getElementById('proposalMessage2').innerHTML = `${result2.analysis.primary.fullName}의 강점을 살리면서 ${result2.analysis.secondary.fullName}의 특성을 보완하는 맞춤형 솔루션을 제안합니다.`;
+
+            const roadmap2 = [
+                { step: 1, title: '원장 역량 강화', content: '원장님의 스타일에 맞는 리더십과 경영 역량을 강화합니다.' },
+                { step: 2, title: '팀 역량 확산', content: '원장님의 철학과 가치관을 팀 전체에 확산시킵니다.' },
+                { step: 3, title: '차별화 브랜딩', content: '병원만의 차별화된 브랜드 이미지를 구축합니다.' },
+                { step: 4, title: '성장 가속화', content: '통합 마케팅과 체계적인 관리로 지속 가능한 성장을 실현합니다.' }
+            ];
+
+            let roadmapHTML2 = '';
+            roadmap2.forEach(step => {
+                roadmapHTML2 += `
+                    <div style="margin-bottom: 20px; padding: 20px 25px; background: linear-gradient(135deg, #f9fafb, #ffffff); border-left: 5px solid #8b5cf6; border-radius: 10px; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);">
+                        <h3 style="color: #8b5cf6; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem;">
+                            <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 6px 14px; border-radius: 50%; margin-right: 12px; font-size: 0.95rem; box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);">
+                                ${step.step}
+                            </span>
+                            ${step.title}
+                        </h3>
+                        <p style="margin-left: 50px; line-height: 1.8; color: #4b5563; font-size: 1.05rem;">
+                            ${step.content}
+                        </p>
+                    </div>
+                `;
+            });
+            document.getElementById('roadmapContainer2').innerHTML = roadmapHTML2;
+
+            console.log('1번 진단 결과:', result1);
+            console.log('2번 진단 결과:', result2);
+        });
+    </script>
+</body>
+</html>

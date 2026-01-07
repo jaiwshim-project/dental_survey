@@ -58,9 +58,19 @@ document.addEventListener('DOMContentLoaded', function() {
     displayProposal(result.analysis);
     displayRoadmap(result.analysis);
 
+    // 주관식 답변 표시
+    displayEssayAnswers();
+
+    // AI 맞춤형 피드백 생성 및 표시
+    displayCustomFeedback(result.analysis);
+
     // 콘솔에 디버깅 정보 출력
     console.log('진단 결과:', result);
     console.log('답변 데이터:', answers);
+
+    // 주관식 답변 가져오기
+    const essayAnswersJSON = sessionStorage.getItem('essayAnswers');
+    const essayAnswers = essayAnswersJSON ? JSON.parse(essayAnswersJSON) : null;
 
     // 진단 결과를 localStorage에 저장 (매니저 대시보드용)
     saveDiagnosisToHistory({
@@ -70,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         date: diagnosisDate,
         diagnosis2: {
             answers: answers,
+            essayAnswers: essayAnswers,
             scores: result.scores,
             primaryType: {
                 type: result.analysis.primary.type,
@@ -534,6 +545,189 @@ function displayRoadmap(analysis) {
     });
 
     container.innerHTML = html;
+}
+
+// AI 맞춤형 피드백 표시
+function displayCustomFeedback(analysis) {
+    const essayAnswersJSON = sessionStorage.getItem('essayAnswers');
+
+    if (!essayAnswersJSON) {
+        document.getElementById('customFeedbackSection').style.display = 'none';
+        return;
+    }
+
+    const essayAnswers = JSON.parse(essayAnswersJSON);
+
+    // essay-feedback.js의 함수 사용
+    const feedback = generateCustomFeedback(
+        essayAnswers,
+        analysis.primary,
+        analysis.secondary
+    );
+
+    if (!feedback || !feedback.hasFeedback) {
+        document.getElementById('customFeedbackSection').style.display = 'none';
+        return;
+    }
+
+    let html = '';
+
+    // 종합 메시지
+    html += `
+        <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+            <h3 style="color: #1e40af; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">💡 종합 분석</h3>
+            <p style="font-size: 1.05rem; line-height: 1.9; color: #1f2937;">${feedback.overallMessage}</p>
+        </div>
+    `;
+
+    // Q26 피드백 (현재 고민)
+    if (feedback.concerns.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #f59e0b; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">📋 현재 고민에 대한 맞춤 피드백</h3>`;
+
+        feedback.concerns.forEach((concern, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+                    <p style="color: #92400e; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${concern.problem}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${concern.solution}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                        <p style="color: #92400e; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">실행 방안:</p>
+                        <p style="color: #1f2937; line-height: 1.7; white-space: pre-line; font-size: 0.95rem;">${concern.action}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // Q27 피드백 (비전)
+    if (feedback.vision.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #8b5cf6; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">🎯 비전 달성 전략</h3>`;
+
+        feedback.vision.forEach((vision, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-left: 5px solid #8b5cf6; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);">
+                    <p style="color: #6b21a8; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${vision.vision}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${vision.strategy}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #8b5cf6;">
+                        <p style="color: #6b21a8; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">추진 우선순위:</p>
+                        <p style="color: #1f2937; line-height: 1.7; font-size: 0.95rem;">${vision.priority}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // Q28 피드백 (투자 우선순위)
+    if (feedback.investment.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #10b981; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">💰 투자 우선순위 가이드</h3>`;
+
+        feedback.investment.forEach((investment, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-left: 5px solid #10b981; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <p style="color: #065f46; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${investment.priority}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${investment.advice}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #10b981;">
+                        <p style="color: #065f46; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">권장 순서:</p>
+                        <p style="color: #1f2937; line-height: 1.7; font-size: 0.95rem;">${investment.sequence}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // 통합 액션 플랜
+    if (feedback.actionPlan && feedback.actionPlan.length > 0) {
+        html += `<div style="margin-top: 40px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 3px solid #10b981; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">`;
+        html += `<h3 style="color: #065f46; margin-bottom: 25px; font-size: 1.3rem; font-weight: bold; text-align: center;">🚀 통합 액션 플랜</h3>`;
+        html += `<p style="color: #047857; text-align: center; margin-bottom: 30px; font-size: 1.05rem;">원장님의 고민, 비전, 투자 우선순위를 종합한 실행 로드맵입니다.</p>`;
+
+        feedback.actionPlan.forEach(plan => {
+            html += `
+                <div style="background: white; border-left: 5px solid #10b981; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <span style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 6px 14px; border-radius: 50%; margin-right: 15px; font-weight: bold; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+                            ${plan.phase}
+                        </span>
+                        <h4 style="color: #065f46; font-size: 1.15rem; font-weight: bold; margin: 0;">${plan.title}</h4>
+                    </div>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px; margin-left: 50px;">${plan.content}</p>
+                    <div style="display: flex; gap: 20px; margin-left: 50px; font-size: 0.9rem;">
+                        <div style="background: #ecfdf5; padding: 8px 15px; border-radius: 6px;">
+                            <span style="color: #047857; font-weight: 600;">소요 기간:</span>
+                            <span style="color: #1f2937; margin-left: 5px;">${plan.duration}</span>
+                        </div>
+                        <div style="background: #dbeafe; padding: 8px 15px; border-radius: 6px; flex: 1;">
+                            <span style="color: #1e40af; font-weight: 600;">기대 결과:</span>
+                            <span style="color: #1f2937; margin-left: 5px;">${plan.expectedResult}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    document.getElementById('customFeedbackContent').innerHTML = html;
+    document.getElementById('customFeedbackSection').style.display = 'block';
+}
+
+// 주관식 답변 표시
+function displayEssayAnswers() {
+    const essayAnswersJSON = sessionStorage.getItem('essayAnswers');
+
+    if (!essayAnswersJSON) {
+        document.getElementById('essayAnswersSection').style.display = 'none';
+        return;
+    }
+
+    const essayAnswers = JSON.parse(essayAnswersJSON);
+
+    // 최소 1개 이상 답변이 있는지 확인
+    const hasAnswers = essayAnswers.some(answer => answer && answer.trim().length > 0);
+
+    if (!hasAnswers) {
+        document.getElementById('essayAnswersSection').style.display = 'none';
+        return;
+    }
+
+    // 주관식 질문 정의
+    const essayQuestions = [
+        '현재 병원 운영에서 가장 고민되거나 해결하고 싶은 문제는 무엇인가요?',
+        '3년 후 우리 병원이 어떤 모습이 되기를 원하시나요?',
+        '시간과 예산이 충분하다면, 병원의 어떤 부분에 가장 투자하고 싶으신가요?'
+    ];
+
+    let html = '';
+    essayAnswers.forEach((answer, index) => {
+        if (answer && answer.trim().length > 0) {
+            html += `
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+                    <h3 style="color: #92400e; margin-bottom: 12px; font-weight: bold; font-size: 1.05rem;">
+                        📝 Q${26 + index}. ${essayQuestions[index]}
+                    </h3>
+                    <p style="color: #1f2937; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 8px;">
+                        ${answer}
+                    </p>
+                </div>
+            `;
+        }
+    });
+
+    if (html) {
+        document.getElementById('essayAnswersContent').innerHTML = html;
+        document.getElementById('essayAnswersSection').style.display = 'block';
+    } else {
+        document.getElementById('essayAnswersSection').style.display = 'none';
+    }
 }
 
 // 인쇄 스타일 추가

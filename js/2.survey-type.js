@@ -1,6 +1,26 @@
 // 설문 진행 로직
 let currentQuestionIndex = 0;
 let answers = []; // 각 문항의 답변 저장 (예: "13", "25" 형식)
+let essayAnswers = ['', '', '']; // 주관식 답변 3개
+
+// 주관식 질문 정의
+const essayQuestions = [
+    {
+        id: 26,
+        question: '현재 병원 운영에서 가장 고민되거나 해결하고 싶은 문제는 무엇인가요?',
+        placeholder: '예: 환자 유치, 직원 관리, 수익 개선, 진료 시스템 등 자유롭게 작성해 주세요.'
+    },
+    {
+        id: 27,
+        question: '3년 후 우리 병원이 어떤 모습이 되기를 원하시나요?',
+        placeholder: '구체적인 목표나 바라는 변화가 있다면 자유롭게 적어주세요.'
+    },
+    {
+        id: 28,
+        question: '시간과 예산이 충분하다면, 병원의 어떤 부분에 가장 투자하고 싶으신가요?',
+        placeholder: '예: 장비, 인력, 마케팅, 교육, 인테리어 등 우선순위를 적어주세요.'
+    }
+];
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
@@ -40,6 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // 질문 표시 함수
 function displayQuestion(index) {
     currentQuestionIndex = index;
+
+    // 주관식 질문 (26, 27, 28번)
+    if (index >= 25) {
+        displayEssayQuestion(index - 25);
+        return;
+    }
+
+    // 객관식 질문 (1-25번)
     const question = questions[index];
 
     // 질문 카드 HTML 생성
@@ -78,6 +106,43 @@ function displayQuestion(index) {
     updateProgress();
 
     // 버튼 상태 업데이트
+    updateButtons();
+}
+
+// 주관식 질문 표시 함수
+function displayEssayQuestion(essayIndex) {
+    const essayQ = essayQuestions[essayIndex];
+
+    const questionHTML = `
+        <div class="question-card">
+            <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="color: #065f46; font-weight: 600; margin: 0;">📝 주관식 질문 ${essayIndex + 1}/3</p>
+            </div>
+            <div class="question-number">Q${essayQ.id}</div>
+            <div class="question-text">${essayQ.question}</div>
+            <textarea
+                id="essayAnswer"
+                style="width: 100%; min-height: 150px; padding: 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: inherit; line-height: 1.6; resize: vertical; margin-top: 20px;"
+                placeholder="${essayQ.placeholder}"
+                oninput="updateEssayAnswer(${essayIndex})"
+            >${essayAnswers[essayIndex]}</textarea>
+            <p style="color: #6b7280; font-size: 0.9rem; margin-top: 10px;">💡 이 내용은 매니저 대시보드에서 확인할 수 있으며, 맞춤 컨설팅 제안에 활용됩니다.</p>
+        </div>
+    `;
+
+    document.getElementById('questionContainer').innerHTML = questionHTML;
+
+    // 진행률 업데이트
+    updateProgress();
+
+    // 버튼 상태 업데이트
+    updateButtons();
+}
+
+// 주관식 답변 업데이트 함수
+function updateEssayAnswer(essayIndex) {
+    const textarea = document.getElementById('essayAnswer');
+    essayAnswers[essayIndex] = textarea.value;
     updateButtons();
 }
 
@@ -138,7 +203,9 @@ function selectOption(optionNumber) {
 // 진행률 업데이트
 function updateProgress() {
     const answeredCount = answers.filter(a => a && a.length === 2).length;
-    const progress = (answeredCount / 25) * 100;
+    const essayAnsweredCount = essayAnswers.filter(a => a && a.trim().length > 0).length;
+    const totalAnswered = answeredCount + essayAnsweredCount;
+    const progress = (totalAnswered / 28) * 100;
     document.getElementById('progressBar').style.width = progress + '%';
     document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
 }
@@ -157,11 +224,20 @@ function updateButtons() {
     }
 
     // 현재 질문의 답변이 완료되었는지 확인
-    const currentAnswer = answers[currentQuestionIndex];
-    const isAnswerComplete = currentAnswer && currentAnswer.length === 2;
+    let isAnswerComplete = false;
 
-    // 마지막 질문인 경우
-    if (currentQuestionIndex === 24) {
+    if (currentQuestionIndex < 25) {
+        // 객관식 질문 (1-25번)
+        const currentAnswer = answers[currentQuestionIndex];
+        isAnswerComplete = currentAnswer && currentAnswer.length === 2;
+    } else {
+        // 주관식 질문 (26-28번)
+        const essayIndex = currentQuestionIndex - 25;
+        isAnswerComplete = essayAnswers[essayIndex] && essayAnswers[essayIndex].trim().length > 0;
+    }
+
+    // 마지막 질문인 경우 (28번 - 주관식 3번째)
+    if (currentQuestionIndex === 27) {
         nextBtn.style.display = 'none';
         submitBtn.style.display = 'block';
         submitBtn.disabled = !isAnswerComplete;
@@ -181,23 +257,37 @@ function previousQuestion() {
 
 // 다음 질문으로
 function nextQuestion() {
-    if (currentQuestionIndex < 24) {
+    if (currentQuestionIndex < 27) {
         displayQuestion(currentQuestionIndex + 1);
     }
 }
 
 // 진단 완료
 function submitSurvey() {
-    // 모든 답변이 완료되었는지 확인
+    // 모든 객관식 답변이 완료되었는지 확인
     const incompleteCount = answers.filter(a => !a || a.length !== 2).length;
 
     if (incompleteCount > 0) {
-        alert(`아직 ${incompleteCount}개의 질문에 답변하지 않았습니다. 모든 질문에 답변해 주세요.`);
+        alert(`아직 ${incompleteCount}개의 객관식 질문에 답변하지 않았습니다. 모든 질문에 답변해 주세요.`);
         return;
+    }
+
+    // 주관식 답변 확인 (선택사항이지만 권장)
+    const essayIncompleteCount = essayAnswers.filter(a => !a || a.trim().length === 0).length;
+    if (essayIncompleteCount > 0) {
+        const confirm = window.confirm(
+            `주관식 질문 ${essayIncompleteCount}개에 답변하지 않으셨습니다.\n` +
+            `주관식 답변은 맞춤 컨설팅 제안에 큰 도움이 됩니다.\n\n` +
+            `답변하지 않고 진단을 완료하시겠습니까?`
+        );
+        if (!confirm) {
+            return;
+        }
     }
 
     // 답변 데이터 저장
     sessionStorage.setItem('answers', JSON.stringify(answers));
+    sessionStorage.setItem('essayAnswers', JSON.stringify(essayAnswers));
 
     // 결과 페이지로 이동
     window.location.href = '2.result-type.html';

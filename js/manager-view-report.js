@@ -31,6 +31,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2번 진단 결과 표시
     if (data.diagnosis2) {
+        console.log('=== 2번 진단 데이터 확인 ===');
+        console.log('data.diagnosis2:', data.diagnosis2);
+        console.log('essayAnswers:', data.diagnosis2.essayAnswers);
+
+        // 강제로 메시지 표시 (디버깅용)
+        const feedbackContent = document.getElementById('customFeedbackContent');
+        const essayContent = document.getElementById('essayAnswersContent');
+
+        if (feedbackContent) {
+            feedbackContent.innerHTML = '<div style="background: #d1fae5; padding: 20px; border-radius: 8px; color: #065f46;">🟢 DOMContentLoaded에서 데이터 확인됨!<br><br>essayAnswers: ' + (data.diagnosis2.essayAnswers ? '있음 (' + data.diagnosis2.essayAnswers.length + '개)' : '없음') + '</div>';
+        }
+
+        if (essayContent) {
+            essayContent.innerHTML = '<div style="background: #d1fae5; padding: 20px; border-radius: 8px; color: #065f46;">🟢 주관식 답변 섹션 확인됨!</div>';
+        }
+
         displayDiagnosis2(data);
     } else {
         document.getElementById('diagnosis2Section').innerHTML = `
@@ -177,8 +193,17 @@ function displayDiagnosis1(data) {
 
 // 2번 진단 결과 표시
 function displayDiagnosis2(data) {
-    const diagnosis2 = data.diagnosis2;
-    const result = analyzeTypeAnswers(diagnosis2.answers, diagnosis2.scores);
+    try {
+        console.log('=== displayDiagnosis2 호출 ===');
+        console.log('data.diagnosis2:', data.diagnosis2);
+
+        const diagnosis2 = data.diagnosis2;
+
+        console.log('essayAnswers:', diagnosis2.essayAnswers);
+        console.log('essayAnswers 타입:', typeof diagnosis2.essayAnswers);
+        console.log('essayAnswers 배열 여부:', Array.isArray(diagnosis2.essayAnswers));
+
+        const result = analyzeTypeAnswers(diagnosis2.answers, diagnosis2.scores);
 
     // 개요
     displayTypeSummary(result.analysis, data.directorName);
@@ -200,6 +225,228 @@ function displayDiagnosis2(data) {
 
     // 로드맵
     displayTypeRoadmap(result.analysis);
+
+    // AI 맞춤형 피드백
+    const feedbackSection = document.getElementById('customFeedbackSection');
+    const feedbackContent = document.getElementById('customFeedbackContent');
+
+    if (feedbackSection && feedbackContent) {
+        feedbackSection.style.display = 'block';
+        displayManagerCustomFeedback(result.analysis, diagnosis2.essayAnswers);
+    }
+
+    // 주관식 답변
+    const essaySection = document.getElementById('essayAnswersSection');
+    const essayContent = document.getElementById('essayAnswersContent');
+
+    if (essaySection && essayContent) {
+        essaySection.style.display = 'block';
+        displayEssayAnswers(diagnosis2.essayAnswers);
+    }
+
+    } catch (error) {
+        console.error('displayDiagnosis2 에러:', error);
+        // 에러 발생시 사용자에게 간단히 알림
+        const feedbackContent = document.getElementById('customFeedbackContent');
+        if (feedbackContent) {
+            feedbackContent.innerHTML = '<div style="background: #fee2e2; padding: 20px; border-radius: 8px; color: #991b1b;">데이터 로드 중 오류가 발생했습니다.</div>';
+        }
+    }
+}
+
+// AI 맞춤형 피드백 표시 (매니저용)
+function displayManagerCustomFeedback(analysis, essayAnswers) {
+    const section = document.getElementById('customFeedbackSection');
+    const content = document.getElementById('customFeedbackContent');
+
+    // essayAnswers 체크
+    if (!essayAnswers || !Array.isArray(essayAnswers) || essayAnswers.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    // essay-feedback.js의 함수가 있는지 확인
+    if (typeof generateCustomFeedback !== 'function') {
+        content.innerHTML = '<div style="background: #fee2e2; padding: 20px; border-radius: 8px; color: #991b1b;">피드백 생성 기능을 로드할 수 없습니다.</div>';
+        section.style.display = 'block';
+        return;
+    }
+
+    // essay-feedback.js의 함수 사용
+    const feedback = generateCustomFeedback(
+        essayAnswers,
+        analysis.primary,
+        analysis.secondary
+    );
+
+    if (!feedback || !feedback.hasFeedback) {
+        section.style.display = 'none';
+        return;
+    }
+
+    // 2.report-type.js와 동일한 HTML 생성 로직 (복사)
+    let html = '';
+
+    // 종합 메시지
+    html += `
+        <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+            <h3 style="color: #1e40af; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">💡 종합 분석</h3>
+            <p style="font-size: 1.05rem; line-height: 1.9; color: #1f2937;">${feedback.overallMessage}</p>
+        </div>
+    `;
+
+    // Q26 피드백 (현재 고민)
+    if (feedback.concerns.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #f59e0b; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">📋 현재 고민에 대한 맞춤 피드백</h3>`;
+
+        feedback.concerns.forEach((concern, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+                    <p style="color: #92400e; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${concern.problem}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${concern.solution}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                        <p style="color: #92400e; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">실행 방안:</p>
+                        <p style="color: #1f2937; line-height: 1.7; white-space: pre-line; font-size: 0.95rem;">${concern.action}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // Q27 피드백 (비전)
+    if (feedback.vision.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #8b5cf6; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">🎯 비전 달성 전략</h3>`;
+
+        feedback.vision.forEach((vision, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-left: 5px solid #8b5cf6; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);">
+                    <p style="color: #6b21a8; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${vision.vision}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${vision.strategy}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #8b5cf6;">
+                        <p style="color: #6b21a8; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">추진 우선순위:</p>
+                        <p style="color: #1f2937; line-height: 1.7; font-size: 0.95rem;">${vision.priority}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // Q28 피드백 (투자 우선순위)
+    if (feedback.investment.length > 0) {
+        html += `<div style="margin-bottom: 30px;">`;
+        html += `<h3 style="color: #10b981; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">💰 투자 우선순위 가이드</h3>`;
+
+        feedback.investment.forEach((investment, index) => {
+            html += `
+                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-left: 5px solid #10b981; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <p style="color: #065f46; font-weight: 600; margin-bottom: 10px; font-size: 1.05rem;">▸ ${investment.priority}</p>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px;">${investment.advice}</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; border-left: 3px solid #10b981;">
+                        <p style="color: #065f46; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">권장 순서:</p>
+                        <p style="color: #1f2937; line-height: 1.7; font-size: 0.95rem;">${investment.sequence}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // 통합 액션 플랜
+    if (feedback.actionPlan && feedback.actionPlan.length > 0) {
+        html += `<div style="margin-top: 40px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 3px solid #10b981; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">`;
+        html += `<h3 style="color: #065f46; margin-bottom: 25px; font-size: 1.3rem; font-weight: bold; text-align: center;">🚀 통합 액션 플랜</h3>`;
+        html += `<p style="color: #047857; text-align: center; margin-bottom: 30px; font-size: 1.05rem;">원장님의 고민, 비전, 투자 우선순위를 종합한 실행 로드맵입니다.</p>`;
+
+        feedback.actionPlan.forEach(plan => {
+            html += `
+                <div style="background: white; border-left: 5px solid #10b981; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <span style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 6px 14px; border-radius: 50%; margin-right: 15px; font-weight: bold; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+                            ${plan.phase}
+                        </span>
+                        <h4 style="color: #065f46; font-size: 1.15rem; font-weight: bold; margin: 0;">${plan.title}</h4>
+                    </div>
+                    <p style="color: #1f2937; line-height: 1.8; margin-bottom: 15px; margin-left: 50px;">${plan.content}</p>
+                    <div style="display: flex; gap: 20px; margin-left: 50px; font-size: 0.9rem;">
+                        <div style="background: #ecfdf5; padding: 8px 15px; border-radius: 6px;">
+                            <span style="color: #047857; font-weight: 600;">소요 기간:</span>
+                            <span style="color: #1f2937; margin-left: 5px;">${plan.duration}</span>
+                        </div>
+                        <div style="background: #dbeafe; padding: 8px 15px; border-radius: 6px; flex: 1;">
+                            <span style="color: #1e40af; font-weight: 600;">기대 결과:</span>
+                            <span style="color: #1f2937; margin-left: 5px;">${plan.expectedResult}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    document.getElementById('customFeedbackContent').innerHTML = html;
+    document.getElementById('customFeedbackSection').style.display = 'block';
+}
+
+// 주관식 답변 표시
+function displayEssayAnswers(essayAnswers) {
+    const section = document.getElementById('essayAnswersSection');
+    const content = document.getElementById('essayAnswersContent');
+
+    // 맨 처음에 무조건 메시지 표시 (함수가 호출되었는지 확인용)
+    content.innerHTML = '<div style="background: #fef3c7; padding: 20px; border-radius: 8px; color: #92400e;">✅ 주관식 답변 함수 호출됨!</div>';
+
+    if (!essayAnswers) {
+        content.innerHTML = '<div style="background: #fee2e2; padding: 20px; border-radius: 8px; color: #991b1b;">❌ essayAnswers가 없습니다.</div>';
+        section.style.display = 'block';
+        return;
+    }
+
+    // 최소 1개 이상 답변이 있는지 확인
+    const hasAnswers = essayAnswers.some(answer => answer && answer.trim().length > 0);
+
+    if (!hasAnswers) {
+        content.innerHTML = '<div style="background: #fee2e2; padding: 20px; border-radius: 8px; color: #991b1b;">❌ 주관식 답변이 비어있습니다.</div>';
+        section.style.display = 'block';
+        return;
+    }
+
+    // 주관식 질문 정의
+    const essayQuestions = [
+        '현재 병원 운영에서 가장 고민되거나 해결하고 싶은 문제는 무엇인가요?',
+        '3년 후 우리 병원이 어떤 모습이 되기를 원하시나요?',
+        '시간과 예산이 충분하다면, 병원의 어떤 부분에 가장 투자하고 싶으신가요?'
+    ];
+
+    let html = '';
+    essayAnswers.forEach((answer, index) => {
+        if (answer && answer.trim().length > 0) {
+            html += `
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; padding: 20px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+                    <h3 style="color: #92400e; margin-bottom: 12px; font-weight: bold; font-size: 1.05rem;">
+                        📝 Q${26 + index}. ${essayQuestions[index]}
+                    </h3>
+                    <p style="color: #1f2937; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 8px;">
+                        ${answer}
+                    </p>
+                </div>
+            `;
+        }
+    });
+
+    if (html) {
+        document.getElementById('essayAnswersContent').innerHTML = html;
+        document.getElementById('essayAnswersSection').style.display = 'block';
+    } else {
+        document.getElementById('essayAnswersSection').style.display = 'none';
+    }
 }
 
 // ===== 1번 진단 표시 함수들 =====
@@ -242,7 +489,7 @@ function analyzeRevenueAnswers(answers, scores) {
 }
 
 function getRevenueStageInfo(stage, score) {
-    const stages = revenueStages; // 1.data-revenue.js에서 가져옴
+    const stages = revenueTypeDefinitions; // 1.analysis-revenue.js에서 가져옴
     const info = stages[stage];
     return {...info, stage, score};
 }
@@ -436,18 +683,31 @@ function generateRevenueRoadmapSteps(analysis) {
 // ===== 2번 진단 표시 함수들 =====
 
 function analyzeTypeAnswers(answers, scores) {
-    // scores 배열이 있으면 사용
-    if (scores && Object.keys(scores).length === 5) {
-        const scoresArray = [scores[1] || scores['A'], scores[2] || scores['B'], scores[3] || scores['C'], scores[4] || scores['D'], scores[5] || scores['E']];
+    console.log('analyzeTypeAnswers 호출:', 'scores=', scores);
+
+    // scores가 객체이고 A, B, C, D, E 키를 가지고 있으면 사용
+    if (scores && typeof scores === 'object' && scores.A !== undefined) {
+        console.log('scores 객체 모드 사용');
+
+        // 점수를 내림차순으로 정렬
+        const sortedEntries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const primaryType = sortedEntries[0][0]; // 가장 높은 점수의 타입 (예: 'D')
+        const primaryScore = sortedEntries[0][1];
+        const secondaryType = sortedEntries[1][0];
+        const secondaryScore = sortedEntries[1][1];
+
+        console.log('Primary:', primaryType, primaryScore);
+        console.log('Secondary:', secondaryType, secondaryScore);
+
         return {
             scores: scores,
             analysis: {
-                primary: getTypeInfo(Object.keys(scores)[0], Math.max(...Object.values(scores))),
-                secondary: getTypeInfo(Object.keys(scores)[1], Object.values(scores).sort((a,b) => b-a)[1]),
-                allScores: Object.entries(scores).map(([type, score]) => getTypeInfo(type, score))
+                primary: getTypeInfo(primaryType, primaryScore),
+                secondary: getTypeInfo(secondaryType, secondaryScore),
+                allScores: sortedEntries.map(([type, score]) => getTypeInfo(type, score))
             },
-            primaryType: {type: Object.keys(scores)[0]},
-            secondaryType: {type: Object.keys(scores)[1]}
+            primaryType: {type: primaryType},
+            secondaryType: {type: secondaryType}
         };
     }
 
@@ -478,11 +738,28 @@ function analyzeTypeAnswers(answers, scores) {
 }
 
 function getTypeInfo(type, score) {
-    const types = typeDefinitions; // 2.data-type.js에서 가져옴
-    // type이 숫자면 A-E로 변환
-    const typeKey = typeof type === 'number' ? ['A', 'B', 'C', 'D', 'E'][type - 1] : type;
-    const info = types[typeKey];
-    return {...info, type: typeKey, score};
+    console.log('getTypeInfo 호출:', 'type=', type, 'typeof=', typeof type);
+
+    // 2.analysis-type.js에서 typeInfo를 가져옴
+    // type이 숫자면 그대로 사용 (1, 2, 3, 4, 5)
+    const typeKey = typeof type === 'number' ? type : ['A', 'B', 'C', 'D', 'E'].indexOf(type) + 1;
+
+    console.log('typeKey:', typeKey);
+    console.log('typeInfo[typeKey]:', typeInfo[typeKey]);
+
+    const info = typeInfo[typeKey];
+
+    if (!info) {
+        alert('❌ typeInfo에서 typeKey를 찾을 수 없습니다!\n\ntypeKey: ' + typeKey + '\ntype: ' + type + '\ntypeof type: ' + typeof type);
+        throw new Error('typeInfo[' + typeKey + ']가 undefined입니다.');
+    }
+
+    // code를 type으로 사용 (A, B, C, D, E)
+    return {
+        ...info,
+        type: info.code,
+        score: score
+    };
 }
 
 function displayTypeSummary(analysis, directorName) {

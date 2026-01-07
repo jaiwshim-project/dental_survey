@@ -665,6 +665,13 @@ footer {
 
 /* 인쇄 스타일 */
 @media print {
+    /* 브라우저가 배경색과 그라디언트를 인쇄하도록 강제 */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
     body {
         background: white;
         padding-top: 0;
@@ -698,13 +705,22 @@ footer {
     }
 
     .report-section h2 {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
+        background: #2563eb !important;
+        color: white !important;
         padding: 10px 15px;
         border-radius: 6px;
         margin: -20px -20px 20px -20px;
         font-size: 1.3rem;
         text-align: center;
+        border: 3px solid #1e40af;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Type 테마의 보라색 */
+    .type-theme .report-section h2 {
+        background: #8b5cf6 !important;
+        border-color: #7c3aed;
     }
 
     /* 진단 점수 요약 섹션을 새 페이지로 시작 */
@@ -714,28 +730,54 @@ footer {
     }
 
     .result-header {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
+        background: #2563eb !important;
+        color: white !important;
         padding: 20px;
         margin-bottom: 15px;
         page-break-after: avoid;
+        border: 3px solid #1e40af;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Type 테마의 보라색 */
+    .type-theme .result-header {
+        background: #8b5cf6 !important;
+        border-color: #7c3aed;
+    }
+
+    .result-header h1,
+    .result-header p {
+        color: white !important;
     }
 
     #diagnosisSummaryBox {
-        background: linear-gradient(135deg, #eff6ff, #dbeafe) !important;
+        background: #dbeafe !important;
         border-left: 5px solid #2563eb !important;
         padding: 20px !important;
         margin-bottom: 15px !important;
         page-break-inside: avoid;
         page-break-after: always;
         box-shadow: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    #diagnosisSummaryBox h3 {
+        color: #2563eb !important;
+    }
+
+    #diagnosisSummaryBox p {
+        color: #1f2937 !important;
     }
 
     .highlight-box {
-        background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+        background: #fde68a !important;
         border-left: 5px solid #f59e0b !important;
         padding: 20px !important;
         box-shadow: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     .score-summary {
@@ -746,6 +788,25 @@ footer {
     .score-item {
         padding: 12px 8px;
         box-shadow: none !important;
+        border: 2px solid #e5e7eb !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .score-item.primary {
+        background: #dbeafe !important;
+        border-color: #2563eb !important;
+    }
+
+    .score-item.secondary {
+        background: #dcfce7 !important;
+        border-color: #10b981 !important;
+    }
+
+    /* Type 테마의 primary 색상 */
+    .type-theme .score-item.primary {
+        background: #ede9fe !important;
+        border-color: #8b5cf6 !important;
     }
 
     footer {
@@ -757,5 +818,17 @@ footer {
     #radarChart {
         max-width: 400px;
         margin: 0 auto;
+    }
+
+    /* 모든 제목과 텍스트가 명확하게 보이도록 */
+    h1, h2, h3, h4, h5, h6 {
+        color: #1f2937 !important;
+    }
+
+    .result-header h1,
+    .result-header h2,
+    .result-header h3,
+    .report-section h2 {
+        color: white !important;
     }
 }

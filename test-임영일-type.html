@@ -77,6 +77,24 @@
                 <div id="roadmapContainer"></div>
             </div>
 
+            <!-- AI 맞춤형 피드백 (주관식 답변 기반) -->
+            <div class="report-section" id="customFeedbackSection" style="display: none;">
+                <h2>🎯 AI 맞춤형 피드백</h2>
+                <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.7;">
+                    원장님의 주관식 답변을 AI가 분석하여 맞춤형 피드백과 실행 방안을 제시합니다.
+                </p>
+                <div id="customFeedbackContent"></div>
+            </div>
+
+            <!-- 원장님의 의견 (주관식 답변) -->
+            <div class="report-section" id="essayAnswersSection" style="display: none;">
+                <h2>원장님의 의견</h2>
+                <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.7;">
+                    원장님께서 직접 작성해 주신 답변입니다. 이 내용은 맞춤 컨설팅 제안에 중요하게 활용됩니다.
+                </p>
+                <div id="essayAnswersContent"></div>
+            </div>
+
             <!-- 액션 버튼 -->
             <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
                 <button class="btn-primary" onclick="window.print()" style="flex: 1; min-width: 200px;">
@@ -110,6 +128,14 @@
         sessionStorage.setItem('diagnosisDate', '2026년 1월 7일');
         sessionStorage.setItem('answers', JSON.stringify(testAnswers));
 
+        // 주관식 답변 추가
+        const essayAnswers = [
+            '현재 가장 고민되는 부분은 환자 상담 시간 대비 치료 결정률이 낮다는 점입니다. 충분히 설명을 해도 환자들이 결정을 미루거나 타 병원과 비교하는 경우가 많아, 상담의 효율성을 높이고 싶습니다. 또한 직원들의 환자 응대 역량을 체계적으로 관리하는 시스템이 부족해 이 부분도 개선이 필요합니다.',
+            '3년 후에는 대전 지역에서 "가장 믿을 수 있고 전문적인 치과"로 자리잡고 싶습니다. 환자들이 자발적으로 추천하고 싶어하는 병원, 직원들도 자부심을 가지고 일할 수 있는 병원이 되었으면 합니다. 또한 지역 사회에 문화적으로도 기여하는 치과로 브랜딩하고 싶습니다.',
+            '시간과 예산이 충분하다면 가장 먼저 직원 교육과 환자 경험 개선에 투자하고 싶습니다. 특히 원장과 직원들이 환자 상담 역량을 체계적으로 향상시킬 수 있는 교육 프로그램을 도입하고, AI 기반 상담 분석 시스템 같은 혁신적인 도구도 검토하고 싶습니다. 그 다음으로는 병원 인테리어와 환자 대기 공간을 더 편안하고 차별화된 분위기로 만들고 싶습니다.'
+        ];
+        sessionStorage.setItem('essayAnswers', JSON.stringify(essayAnswers));
+
         // 진단 결과 생성
         document.addEventListener('DOMContentLoaded', function() {
             const answers = testAnswers;
@@ -127,9 +153,105 @@
             displayProposal(result.analysis);
             displayRoadmap(result.analysis);
 
+            // 주관식 답변 표시
+            displayEssayAnswers();
+
+            // AI 맞춤형 피드백 생성 및 표시
+            displayCustomFeedback(result.analysis);
+
             console.log('진단 결과:', result);
+
+            // localStorage에 진단 데이터 저장 (매니저 대시보드용)
+            const essayAnswersJSON = sessionStorage.getItem('essayAnswers');
+            const essayAnswers = essayAnswersJSON ? JSON.parse(essayAnswersJSON) : null;
+
+            console.log('=== 진단 데이터 저장 시작 ===');
+            console.log('essayAnswers:', essayAnswers);
+
+            saveDiagnosisToHistory({
+                clinicName: '화이트서울치과',
+                directorName: '임영일',
+                region: '대전 중구',
+                date: '2026년 1월 7일',
+                diagnosis2: {
+                    answers: testAnswers,
+                    essayAnswers: essayAnswers,
+                    scores: result.scores,
+                    primaryType: {
+                        type: result.analysis.primary.type,
+                        name: result.analysis.primary.name,
+                        fullName: result.analysis.primary.fullName,
+                        score: result.analysis.primary.score
+                    },
+                    secondaryType: {
+                        type: result.analysis.secondary.type,
+                        name: result.analysis.secondary.name,
+                        fullName: result.analysis.secondary.fullName,
+                        score: result.analysis.secondary.score
+                    }
+                }
+            });
+
+            console.log('localStorage에 데이터 저장 완료');
+
+            // 저장 확인
+            const history = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
+            const saved = history.find(h => h.clinicName === '화이트서울치과' && h.directorName === '임영일');
+            console.log('저장된 진단 데이터:', saved);
+            if (saved && saved.diagnosis2 && saved.diagnosis2.essayAnswers) {
+                console.log('✅ essayAnswers 저장 확인됨:', saved.diagnosis2.essayAnswers.length + '개');
+            } else {
+                console.error('❌ essayAnswers 저장 실패!');
+            }
         });
+
+        // 진단 기록 저장 함수 (2.report-type.js와 동일)
+        function saveDiagnosisToHistory(diagnosisData) {
+            try {
+                let history = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
+
+                const existingIndex = history.findIndex(h =>
+                    h.clinicName === diagnosisData.clinicName &&
+                    h.directorName === diagnosisData.directorName
+                );
+
+                const doctorCount = sessionStorage.getItem('doctorCount');
+                const nurseCount = sessionStorage.getItem('nurseCount');
+                const counselorCount = sessionStorage.getItem('counselorCount');
+
+                if (existingIndex >= 0) {
+                    history[existingIndex].diagnosis2 = diagnosisData.diagnosis2;
+                    history[existingIndex].date = diagnosisData.date;
+                    history[existingIndex].region = diagnosisData.region;
+                    history[existingIndex].doctorCount = doctorCount;
+                    history[existingIndex].nurseCount = nurseCount;
+                    history[existingIndex].counselorCount = counselorCount;
+                    history[existingIndex].timestamp = Date.now();
+                } else {
+                    const newRecord = {
+                        id: 'diag_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        timestamp: Date.now(),
+                        clinicName: diagnosisData.clinicName,
+                        directorName: diagnosisData.directorName,
+                        region: diagnosisData.region,
+                        doctorCount: doctorCount,
+                        nurseCount: nurseCount,
+                        counselorCount: counselorCount,
+                        date: diagnosisData.date,
+                        diagnosis1: null,
+                        diagnosis2: diagnosisData.diagnosis2
+                    };
+                    history.push(newRecord);
+                }
+
+                localStorage.setItem('diagnosisHistory', JSON.stringify(history));
+                console.log('진단 기록 저장 완료:', history);
+            } catch (error) {
+                console.error('진단 기록 저장 실패:', error);
+            }
+        }
     </script>
+    <script src="js/essay-feedback.js"></script>
     <script src="js/2.report-type.js"></script>
 </body>
 </html>

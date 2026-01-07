@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 진단 결과</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .diagnosis-separator {
+            margin: 60px 0;
+            padding: 30px 0;
+            border-top: 3px dashed #e5e7eb;
+            text-align: center;
+        }
+        .diagnosis-separator-text {
+            display: inline-block;
+            background: white;
+            padding: 10px 30px;
+            color: #6b7280;
+            font-weight: 600;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: -45px;
+        }
+        .back-to-dashboard {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .back-to-dashboard:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 200px;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .print-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        @media print {
+            .back-to-dashboard, .print-button {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="manager-dashboard.html" class="back-to-dashboard">← 대시보드로 돌아가기</a>
+    <button onclick="window.print()" class="print-button">🖨️ 인쇄하기</button>
+
+    <div class="container">
+        <!-- 병원 정보 헤더 -->
+        <div class="result-header" style="text-align: center; margin-bottom: 40px;">
+            <h1 id="hospitalInfo" style="font-size: 2rem; margin-bottom: 10px;"></h1>
+            <p id="hospitalDetail" style="font-size: 1rem; opacity: 0.85; margin-bottom: 10px;"></p>
+            <p id="diagnosisDate" style="font-size: 0.95rem; opacity: 0.85;"></p>
+        </div>
+
+        <!-- 이메일 요청 정보 -->
+        <div id="emailRequestsSection" style="display: none; background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; padding: 25px 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
+            <h3 style="color: #92400e; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📧 이메일 요청 정보</h3>
+            <div id="emailRequestsContent"></div>
+        </div>
+
+        <!-- 1번 진단 결과 -->
+        <div id="diagnosis1Section">
+            <div class="revenue-theme" style="padding: 20px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; margin-bottom: 30px;">
+                <p style="font-size: 1.5rem; font-weight: bold; color: #92400e; text-align: center; margin: 0;">💰 1. 병원 수익 단계별 진단 결과</p>
+            </div>
+
+            <!-- 진단 결과 개요 -->
+            <div id="diagnosisSummaryBox1" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+                <p id="diagnosisSummary1" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+            </div>
+
+            <!-- 진단 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart1"></canvas>
+                </div>
+                <div class="score-summary" id="scoreSummary1"></div>
+            </div>
+
+            <!-- 주 단계 -->
+            <div class="report-section">
+                <h2>주 단계</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryStageName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryStageDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics1" style="line-height: 1.8;"></ul>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords1" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 단계 -->
+            <div class="report-section">
+                <h2>보조 단계</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryStageName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryStageDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics1" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 방향 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage1" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer1"></div>
+            </div>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="diagnosis-separator">
+            <div class="diagnosis-separator-text">⬇️ 2번 진단 결과 ⬇️</div>
+        </div>
+
+        <!-- 2번 진단 결과 -->
+        <div id="diagnosis2Section">
+            <div class="type-theme" style="padding: 20px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 12px; margin-bottom: 30px;">
+                <p style="font-size: 1.5rem; font-weight: bold; color: #6b21a8; text-align: center; margin: 0;">🏥 2. 원장 스타일 5유형 진단 결과</p>
+            </div>
+
+            <!-- 분석 결과 개요 -->
+            <div id="diagnosisSummaryBox2" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+                <p id="diagnosisSummary2" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+            </div>
+
+            <!-- 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart2"></canvas>
+                </div>
+                <div class="score-summary" id="scoreSummary2"></div>
+            </div>
+
+            <!-- 주 유형 -->
+            <div class="report-section">
+                <h2>주 유형</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryTypeName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryTypeDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics2" style="line-height: 1.8;"></ul>
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords2" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 유형 -->
+            <div class="report-section">
+                <h2>보조 유형</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryTypeName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryTypeDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics2" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage2" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer2"></div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+            <p style="text-align: center; color: #6b7280;">&copy; 2026 치과병원 컨설팅 솔루션</p>
+        </footer>
+    </div>
+
+    <script src="js/1.data-revenue.js"></script>
+    <script src="js/2.data-type.js"></script>
+    <script src="js/manager-view-report.js"></script>
+</body>
+</html>

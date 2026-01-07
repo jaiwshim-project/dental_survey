@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>치과병원 통합 진단 시스템</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-section h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .hero-section p {
+            font-size: 1.05rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .diagnosis-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .diagnosis-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid;
+            transition: transform 0.3s;
+        }
+
+        .diagnosis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .diagnosis-card.revenue {
+            border-top-color: #2563eb;
+        }
+
+        .diagnosis-card.type {
+            border-top-color: #8b5cf6;
+        }
+
+        .diagnosis-card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diagnosis-card.revenue h2 {
+            color: #2563eb;
+        }
+
+        .diagnosis-card.type h2 {
+            color: #8b5cf6;
+        }
+
+        .diagnosis-card .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .diagnosis-card.revenue .badge {
+            background: #2563eb;
+        }
+
+        .diagnosis-card.type .badge {
+            background: #8b5cf6;
+        }
+
+        .diagnosis-card h3 {
+            font-size: 1.05rem;
+            color: #1f2937;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .diagnosis-card p {
+            line-height: 1.6;
+            color: #4b5563;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .diagnosis-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        .diagnosis-card li {
+            padding: 6px 0;
+            padding-left: 22px;
+            position: relative;
+            color: #4b5563;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .diagnosis-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .diagnosis-card.revenue li:before {
+            color: #2563eb;
+        }
+
+        .diagnosis-card.type li:before {
+            color: #8b5cf6;
+        }
+
+        .process-section {
+            background: linear-gradient(135deg, #f0f9ff, #faf5ff);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px solid #e0e7ff;
+        }
+
+        .process-section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .process-steps {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+            padding: 3px;
+            min-width: 0;
+        }
+
+        .process-step .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .process-step:nth-child(1) .step-number {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+        }
+
+        .process-step:nth-child(3) .step-number {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .process-step:nth-child(5) .step-number {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .process-step h3 {
+            font-size: 0.9rem;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .process-step p {
+            color: #6b7280;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .process-arrow {
+            font-size: 1.2rem;
+            color: #9ca3af;
+            flex: 0 0 20px;
+            margin-top: 15px;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 25px;
+        }
+
+        .cta-section h2 {
+            font-size: 1.4rem;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .start-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb, #8b5cf6);
+            color: white;
+            padding: 15px 45px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 25px 15px;
+                margin-bottom: 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-section p {
+                font-size: 0.95rem;
+            }
+
+            .diagnosis-overview {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin: 20px 0;
+            }
+
+            .diagnosis-card {
+                padding: 18px;
+            }
+
+            .process-section {
+                padding: 20px 15px;
+                margin: 20px 0;
+            }
+
+            .cta-section {
+                padding: 20px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .process-steps {
+                flex-direction: column;
+            }
+
+            .process-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+        body {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            min-height: 100vh;
+        }
+
+        /* 매니저 대시보드 버튼 (푸터용) */
+        .manager-dashboard-btn {
+            display: inline-block;
+            background: rgba(31, 41, 55, 0.8);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .manager-dashboard-btn:hover {
+            background: rgba(31, 41, 55, 1);
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .manager-dashboard-btn::before {
+            content: "🔐 ";
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 히어로 섹션 -->
+        <div class="hero-section">
+            <h1>🏥 치과병원 통합 진단 시스템</h1>
+            <p>병원의 현재 상태를 정확히 파악하고, 원장님의 운영 스타일을 분석하여<br>
+            최적화된 맞춤 솔루션을 제안합니다</p>
+        </div>
+
+        <main>
+            <!-- 진단 개요 -->
+            <div class="diagnosis-overview">
+                <!-- 1. 병원 수익 단계별 진단 -->
+                <div class="diagnosis-card revenue">
+                    <h2>
+                        <span class="badge">STEP 1</span>
+                        1. 병원 수익 단계별 진단
+                    </h2>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">📊 진단 목적</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px;">병원의 현재 수익 구조와 운영 상태를 5가지 단계로 분석하여, 병원이 직면한 핵심 과제를 파악합니다.</p>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">🎯 진단 내용</h3>
+                    <ul>
+                        <li><strong>수익 정체·감소:</strong> 환자 이탈 원인 분석</li>
+                        <li><strong>수익 유지·불안정:</strong> 매출 변동성 진단</li>
+                        <li><strong>원장 과부하:</strong> 업무 부담 평가</li>
+                        <li><strong>수익 안정·확장:</strong> 성장 준비도 측정</li>
+                        <li><strong>고수익·브랜드형:</strong> 신뢰 기반 평가</li>
+                    </ul>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">✨ 진단 결과</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px;">총 12개 질문 (약 5분 소요)<br>
+                    주 단계와 보조 단계를 파악하여 병원 현황에 맞는 개선 방향을 제시합니다.</p>
+                </div>
+
+                <!-- 2. 원장 스타일 진단 -->
+                <div class="diagnosis-card type">
+                    <h2>
+                        <span class="badge">STEP 2</span>
+                        2. 원장 스타일 진단
+                    </h2>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">📊 진단 목적</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px;">원장님의 의사결정 방식, 운영 철학, 우선순위를 5가지 유형으로 분류하여 병원 운영 스타일을 파악합니다.</p>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">🎯 진단 내용</h3>
+                    <ul>
+                        <li><strong>결단·속도형:</strong> 빠른 실행 선호도</li>
+                        <li><strong>구조·안정형:</strong> 시스템화 지향성</li>
+                        <li><strong>팀·교육형:</strong> 직원 중심 운영</li>
+                        <li><strong>수익·경영형:</strong> ROI 중심 사고</li>
+                        <li><strong>환자·신뢰형:</strong> 관계 중심 경영</li>
+                    </ul>
+
+                    <h3 style="font-size: 1.05rem; margin-top: 12px; margin-bottom: 8px;">✨ 진단 결과</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px;">총 25개 질문 (약 7분 소요)<br>
+                    주 유형과 보조 유형을 분석하여 원장님께 최적화된 솔루션 전략을 제안합니다.</p>
+                </div>
+            </div>
+
+            <!-- 진단 프로세스 -->
+            <div class="process-section">
+                <h2>📋 진단 프로세스</h2>
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <h3>병원 수익 단계별 진단</h3>
+                        <p>병원의 현재 수익 구조와<br>운영 상태를 분석합니다</p>
+                    </div>
+
+                    <div class="process-arrow">→</div>
+
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <h3>원장 스타일 진단</h3>
+                        <p>원장님의 의사결정 방식과<br>운영 철학을 파악합니다</p>
+                    </div>
+
+                    <div class="process-arrow">→</div>
+
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <h3>통합 분석 결과</h3>
+                        <p>두 진단 결과를 종합하여<br>맞춤 솔루션을 제안합니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 진단 결과 활용 -->
+            <div class="info-box" style="margin: 25px 0; padding: 20px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 10px;">💡 진단 결과 활용</h3>
+                <ul style="margin-top: 10px;">
+                    <li style="font-size: 0.9rem; padding: 5px 0;">병원 현황에 맞는 <strong>AI 상담 시스템 도입 전략</strong> 수립</li>
+                    <li style="font-size: 0.9rem; padding: 5px 0;">원장님의 스타일에 최적화된 <strong>운영 개선 방안</strong> 제시</li>
+                    <li style="font-size: 0.9rem; padding: 5px 0;">단계별 실행 로드맵과 <strong>구체적인 실행 방법</strong> 제공</li>
+                    <li style="font-size: 0.9rem; padding: 5px 0;">상담 구조 개선, 직원 교육, 수익 안정화 등 <strong>맞춤형 솔루션</strong> 제안</li>
+                </ul>
+            </div>
+
+            <!-- CTA 섹션 -->
+            <div class="cta-section">
+                <h2>🚀 지금 바로 진단을 시작하세요!</h2>
+                <p>두 가지 진단을 순차적으로 완료하시면<br>
+                병원에 최적화된 맞춤 솔루션 리포트를 받아보실 수 있습니다.</p>
+                <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 18px;">
+                    ⏱️ 총 소요 시간: 약 12분 | 📧 결과는 이메일로도 발송 가능
+                </p>
+                <a href="1.index-revenue.html" class="start-button">
+                    진단 시작하기 →
+                </a>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 통합 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn">매니저 대시보드</a>
+        </footer>
+    </div>
+</body>
+</html>

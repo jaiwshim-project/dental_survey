@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. 병원 수익 단계별 진단</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="revenue-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="1.index-revenue.html" class="navbar-brand">
+                <span>💰</span>
+                <span>1. 병원 수익 단계별 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="1.index-revenue.html">홈</a></li>
+                <li><a href="1.index-revenue.html#start">진단 시작</a></li>
+                <li><a href="1.test-demo-revenue.html">시연 보기</a></li>
+                <li><a href="2.index-type.html">원장 스타일 진단</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="survey-header">
+            <h1 id="clinicInfo"></h1>
+            <p>1. 병원 수익 단계별 5유형 진단 (총 12문항 | 각 질문마다 2개 선택)</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.95rem;" id="progressText">진행률: 0/12 (0%)</p>
+        </div>
+
+        <main>
+            <!-- 질문 카드 -->
+            <div class="question-card" id="questionCard">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+            </div>
+
+            <!-- 네비게이션 버튼 -->
+            <div class="navigation-buttons">
+                <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" style="display: none;">
+                    이전 문항
+                </button>
+                <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    다음 문항
+                </button>
+                <button class="btn-primary" id="submitBtn" onclick="submitSurvey()" style="display: none; background: #10b981;">
+                    결과 확인
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 1. 병원 수익 단계별 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
+        </footer>
+    </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+    <script src="js/1.questions-revenue.js"></script>
+    <script src="js/1.analysis-revenue.js"></script>
+    <script src="js/1.survey-revenue.js"></script>
+</body>
+</html>

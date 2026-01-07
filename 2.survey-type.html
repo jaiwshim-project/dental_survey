@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. 원장 스타일 5유형 진단 - 설문 진행</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="type-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="2.index-type.html" class="navbar-brand">
+                <span>🏥</span>
+                <span>2. 원장 스타일 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="2.index-type.html">홈</a></li>
+                <li><a href="2.index-type.html#start">진단 시작</a></li>
+                <li><a href="2.test-demo-type.html">시연 보기</a></li>
+                <li><a href="1.index-revenue.html">1. 수익 단계별 진단</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="survey-header">
+            <h1 id="hospitalInfo"></h1>
+            <p>총 25문항 | 소요시간: 5~7분</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <p style="margin-top: 10px;">
+                <span id="currentQuestion">1</span> / 25 문항 완료
+            </p>
+        </div>
+
+        <main>
+            <div class="info-box" style="margin-bottom: 30px;">
+                <h3>답변 방법</h3>
+                <ul>
+                    <li><strong>○ (1순위)</strong>: 가장 가까운 답변을 먼저 선택해 주세요</li>
+                    <li><strong>△ (2순위)</strong>: 두 번째로 가까운 답변을 선택해 주세요</li>
+                    <li>각 질문마다 반드시 <strong>2개의 답변</strong>을 선택해야 합니다</li>
+                </ul>
+            </div>
+
+            <div id="questionContainer"></div>
+
+            <div class="navigation-buttons">
+                <button type="button" class="btn-secondary" id="prevBtn" style="display: none;">
+                    이전 질문
+                </button>
+                <button type="button" class="btn-primary" id="nextBtn" disabled>
+                    다음 질문
+                </button>
+                <button type="button" class="btn-primary" id="submitBtn" style="display: none;" disabled>
+                    진단 완료
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 2. 원장 스타일 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
+        </footer>
+    </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+    <script src="js/2.questions-type.js"></script>
+    <script src="js/2.survey-type.js"></script>
+</body>
+</html>

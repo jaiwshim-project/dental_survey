@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. 병원 수익 단계별 5유형 진단 시스템</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="revenue-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="1.index-revenue.html" class="navbar-brand">
+                <span>💰</span>
+                <span>1. 병원 수익 단계별 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="1.index-revenue.html" class="active">홈</a></li>
+                <li><a href="#start">진단 시작</a></li>
+                <li><a href="1.test-demo-revenue.html">시연 보기</a></li>
+                <li><a href="2.index-type.html">원장 스타일 진단</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>1. 병원 수익 단계별 5유형 진단 시스템</h1>
+            <p class="subtitle">병원 현황 진단 및 맞춤 솔루션 제안 도구</p>
+        </header>
+
+        <main>
+            <div class="intro-section">
+                <h2>진단 소개</h2>
+                <p>이 진단은 병원의 <strong>현재 수익 단계</strong>를 파악하여<br>
+                상황에 맞는 최적의 솔루션을 제안하기 위한 도구입니다.</p>
+
+                <div class="info-box">
+                    <h3>진단 방식</h3>
+                    <ul>
+                        <li>총 <strong>12개 질문</strong> (소요시간: 5~7분)</li>
+                        <li>각 질문마다 <strong>가장 가까운 답변 2개</strong> 선택 (1순위 ○, 2순위 △)</li>
+                        <li>1순위 2점, 2순위 1점으로 점수를 합산하여 <strong>주 단계와 보조 단계</strong> 도출</li>
+                        <li>이 진단은 <strong>"능력 평가"가 아니라 현재 병원 국면 진단</strong>입니다</li>
+                    </ul>
+                </div>
+
+                <div class="types-preview">
+                    <h3>5가지 수익 단계 유형</h3>
+                    <div class="type-cards">
+                        <div class="type-card">
+                            <div class="type-number">1</div>
+                            <h4>수익 정체·감소</h4>
+                            <p>환자 이탈, 선택 이유 상실</p>
+                        </div>
+                        <div class="type-card">
+                            <div class="type-number">2</div>
+                            <h4>수익 유지·불안정</h4>
+                            <p>변동성, 상담 편차</p>
+                        </div>
+                        <div class="type-card">
+                            <div class="type-number">3</div>
+                            <h4>원장 과부하</h4>
+                            <p>과로, 개인 의존</p>
+                        </div>
+                        <div class="type-card">
+                            <div class="type-number">4</div>
+                            <h4>수익 안정·확장 준비</h4>
+                            <p>시스템화, 표준화</p>
+                        </div>
+                        <div class="type-card">
+                            <div class="type-number">5</div>
+                            <h4>고수익·브랜드형</h4>
+                            <p>신뢰, 이미지, 장기 관계</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="start">
+                <h2>진단 시작하기</h2>
+                <form id="startForm">
+                    <div class="form-group">
+                        <label for="clinicName">병원명 *</label>
+                        <input type="text" id="clinicName" required placeholder="예: 화이트 서울 치과">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="directorName">원장명 *</label>
+                        <input type="text" id="directorName" required placeholder="예: 임영일">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="region">지역</label>
+                        <input type="text" id="region" placeholder="예: 대전 중구">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="doctorCount">의사 수 *</label>
+                            <input type="number" id="doctorCount" required min="1" placeholder="예: 1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nurseCount">간호사 수 *</label>
+                            <input type="number" id="nurseCount" required min="0" placeholder="예: 1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="counselorCount">상담사 수 *</label>
+                            <input type="number" id="counselorCount" required min="0" placeholder="예: 1">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">진단 시작하기</button>
+                </form>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 1. 병원 수익 단계별 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
+        </footer>
+    </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // 폼 제출
+        document.getElementById('startForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clinicName = document.getElementById('clinicName').value;
+            const directorName = document.getElementById('directorName').value;
+            const region = document.getElementById('region').value;
+            const doctorCount = document.getElementById('doctorCount').value;
+            const nurseCount = document.getElementById('nurseCount').value;
+            const counselorCount = document.getElementById('counselorCount').value;
+
+            // 진단 일자 저장
+            const today = new Date();
+            const diagnosisDate = today.getFullYear() + '년 ' +
+                                  (today.getMonth() + 1) + '월 ' +
+                                  today.getDate() + '일';
+
+            // 세션 스토리지에 정보 저장
+            sessionStorage.setItem('clinicName', clinicName);
+            sessionStorage.setItem('directorName', directorName);
+            sessionStorage.setItem('region', region);
+            sessionStorage.setItem('doctorCount', doctorCount);
+            sessionStorage.setItem('nurseCount', nurseCount);
+            sessionStorage.setItem('counselorCount', counselorCount);
+            sessionStorage.setItem('diagnosisDate', diagnosisDate);
+
+            // 설문 페이지로 이동
+            window.location.href = '1.survey-revenue.html';
+        });
+    </script>
+</body>
+</html>

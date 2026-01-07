@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. 병원 수익 단계별 진단 결과</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="revenue-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="1.index-revenue.html" class="navbar-brand">
+                <span>💰</span>
+                <span>1. 병원 수익 단계별 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="1.index-revenue.html">홈</a></li>
+                <li><a href="1.index-revenue.html#start">진단 시작</a></li>
+                <li><a href="1.test-demo-revenue.html">시연 보기</a></li>
+                <li><a href="2.index-type.html">원장 스타일 진단</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="result-header">
+            <h1 id="hospitalInfo" style="font-size: 1.8rem; margin-bottom: 8px;"></h1>
+            <p id="hospitalDetail" style="font-size: 0.95rem; opacity: 0.85; margin-bottom: 15px;"></p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: #fbbf24; margin: 15px 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">1. 병원 수익 단계별 진단 결과</p>
+            <p id="diagnosisDate" style="font-size: 0.95rem; margin-top: 8px; opacity: 0.85;"></p>
+        </div>
+
+        <!-- 진단 결과 개요 -->
+        <div id="diagnosisSummaryBox" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #2563eb; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+            <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">📊 진단 결과 개요</h3>
+            <p id="diagnosisSummary" style="font-size: 1.05rem; line-height: 1.9; color: #1f2937; margin: 0;"></p>
+        </div>
+
+        <main>
+            <!-- 진단 점수 요약 -->
+            <div class="report-section">
+                <h2>진단 점수 요약</h2>
+
+                <!-- 레이더 차트 -->
+                <div style="max-width: 600px; margin: 0 auto 25px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <!-- 점수 카드 -->
+                <div class="score-summary" id="scoreSummary"></div>
+            </div>
+
+            <!-- 주 단계 -->
+            <div class="report-section">
+                <h2>주 단계</h2>
+                <div class="highlight-box">
+                    <h3 id="primaryStageName" style="color: #2563eb; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="primaryStageDescription" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">주요 특징</h3>
+                <ul id="primaryCharacteristics" style="line-height: 1.8;"></ul>
+
+                <h3 style="margin-top: 25px; color: #2563eb; font-size: 1.15rem; font-weight: bold;">제안 키워드</h3>
+                <div id="primaryKeywords" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 보조 단계 -->
+            <div class="report-section">
+                <h2>보조 단계</h2>
+                <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 5px solid #10b981; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+                    <h3 id="secondaryStageName" style="color: #10b981; font-size: 1.4rem; font-weight: bold; margin-bottom: 15px;"></h3>
+                    <p id="secondaryStageDescription" style="font-size: 1.05rem; line-height: 1.8;"></p>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #10b981; font-size: 1.15rem; font-weight: bold;">보조 특징</h3>
+                <ul id="secondaryCharacteristics" style="line-height: 1.8;"></ul>
+            </div>
+
+            <!-- 맞춤 제안 방향 -->
+            <div class="report-section">
+                <h2>맞춤 제안 방향</h2>
+                <div class="highlight-box">
+                    <p id="proposalMessage" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <!-- 전략 로드맵 -->
+            <div class="report-section">
+                <h2>병원 맞춤 전략 로드맵</h2>
+                <div id="roadmapContainer"></div>
+            </div>
+
+            <!-- 액션 버튼 -->
+            <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn-primary" onclick="window.print()" style="flex: 1; min-width: 200px;">
+                    결과 출력하기
+                </button>
+                <button class="btn-primary" onclick="showEmailModal()" style="flex: 1; min-width: 200px; background: #10b981;">
+                    이메일로 받기
+                </button>
+            </div>
+
+            <!-- 다음 진단 진행 -->
+            <div style="background: linear-gradient(135deg, #f0f9ff, #faf5ff); border: 2px solid #c7d2fe; border-radius: 12px; padding: 30px; margin-top: 30px; text-align: center;">
+                <h3 style="color: #1f2937; font-size: 1.3rem; margin-bottom: 15px;">🎯 다음 단계: 원장 스타일 진단</h3>
+                <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.7;">
+                    병원 수익 단계별 진단이 완료되었습니다.<br>
+                    이제 <strong>원장님의 운영 스타일</strong>을 분석하여 최적화된 솔루션을 제안받으세요.
+                </p>
+                <button class="btn-primary" onclick="window.location.href='2.index-type.html'" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; padding: 18px 40px; font-size: 1.1rem;">
+                    2. 원장 스타일 진단 시작하기 →
+                </button>
+                <div style="margin-top: 20px;">
+                    <button class="btn-secondary" onclick="window.location.href='index.html'" style="padding: 12px 30px;">
+                        처음으로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 1. 병원 수익 단계별 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
+        </footer>
+    </div>
+
+    <!-- 이메일 받기 모달 -->
+    <div id="emailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 40px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 style="margin-bottom: 20px; color: #2563eb;">진단 결과 이메일로 받기</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">진단 결과를 이메일과 문자로 받아보실 수 있습니다.</p>
+
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="userEmail">이메일 주소 *</label>
+                    <input type="email" id="userEmail" required placeholder="example@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="userPhone">휴대폰 번호 *</label>
+                    <input type="tel" id="userPhone" required placeholder="010-0000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="userMessage">질문 또는 추가 요청사항</label>
+                    <textarea id="userMessage" rows="4" style="width: 100%; padding: 12px 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: inherit; resize: vertical;" placeholder="궁금하신 점이나 추가로 요청하실 사항을 입력해 주세요."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="button" class="btn-secondary" onclick="closeEmailModal()" style="flex: 1;">
+                        취소
+                    </button>
+                    <button type="submit" class="btn-primary" style="flex: 1;">
+                        전송
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // 이메일 모달 표시
+        function showEmailModal() {
+            const modal = document.getElementById('emailModal');
+            modal.style.display = 'flex';
+        }
+
+        // 이메일 모달 닫기
+        function closeEmailModal() {
+            const modal = document.getElementById('emailModal');
+            modal.style.display = 'none';
+            document.getElementById('emailForm').reset();
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('emailModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEmailModal();
+            }
+        });
+
+        // 이메일 폼 제출
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const userEmail = document.getElementById('userEmail').value;
+            const userPhone = document.getElementById('userPhone').value;
+            const userMessage = document.getElementById('userMessage').value;
+
+            // 진단 데이터 가져오기
+            const clinicName = sessionStorage.getItem('clinicName');
+            const directorName = sessionStorage.getItem('directorName');
+            const region = sessionStorage.getItem('region');
+
+            console.log('이메일 전송 요청:', {
+                email: userEmail,
+                phone: userPhone,
+                message: userMessage,
+                clinic: clinicName,
+                director: directorName,
+                region: region
+            });
+
+            // localStorage의 diagnosisHistory에 이메일 정보 추가
+            try {
+                let history = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
+
+                // 병원명과 원장명으로 기존 기록 찾기
+                const existingIndex = history.findIndex(h =>
+                    h.clinicName === clinicName &&
+                    h.directorName === directorName
+                );
+
+                if (existingIndex >= 0) {
+                    // 1번 진단의 이메일 정보 업데이트
+                    if (!history[existingIndex].emailRequests) {
+                        history[existingIndex].emailRequests = {};
+                    }
+                    history[existingIndex].emailRequests.diagnosis1 = {
+                        email: userEmail,
+                        phone: userPhone,
+                        message: userMessage,
+                        requestDate: new Date().toISOString()
+                    };
+                    history[existingIndex].timestamp = Date.now();
+
+                    // localStorage에 저장
+                    localStorage.setItem('diagnosisHistory', JSON.stringify(history));
+                    console.log('이메일 정보 저장 완료 (1번 진단)');
+                }
+            } catch (error) {
+                console.error('이메일 정보 저장 실패:', error);
+            }
+
+            alert('진단 결과 전송이 요청되었습니다.\n\n' +
+                  '이메일: ' + userEmail + '\n' +
+                  '휴대폰: ' + userPhone + '\n\n' +
+                  '※ 실제 이메일/문자 전송 기능은 서버 연동 후 활성화됩니다.');
+
+            closeEmailModal();
+        });
+    </script>
+    <script src="js/1.questions-revenue.js"></script>
+    <script src="js/1.analysis-revenue.js"></script>
+    <script src="js/1.report-revenue.js"></script>
+</body>
+</html>

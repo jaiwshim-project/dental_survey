@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진단 시연 - 수익 단계별 진단</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="revenue-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="1.index-revenue.html" class="navbar-brand">
+                <span>💰</span>
+                <span>1. 병원 수익 단계별 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="1.index-revenue.html">홈</a></li>
+                <li><a href="1.index-revenue.html#start">진단 시작</a></li>
+                <li><a href="1.test-demo-revenue.html" class="active">시연 보기</a></li>
+                <li><a href="2.index-type.html">원장 스타일 진단</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>1. 병원 수익 단계별 5유형 진단 시스템</h1>
+            <p class="subtitle">테스트 시연 모드</p>
+        </header>
+
+        <main>
+            <div class="info-box">
+                <h3>🎯 시연 안내</h3>
+                <p>테스트 병원 데이터를 사용하여 자동으로 결과를 생성합니다.</p>
+                <ul>
+                    <li><strong>병원명:</strong> 화이트 서울 치과</li>
+                    <li><strong>원장명:</strong> 임영일 원장</li>
+                    <li><strong>지역:</strong> 대전 중구</li>
+                    <li><strong>응답 데이터:</strong> 12문항 사전 입력 완료</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <button class="btn-primary" onclick="runDemo()" style="font-size: 1.2rem; padding: 20px 50px;">
+                    🚀 진단 결과 보기
+                </button>
+            </div>
+
+            <div class="info-box" style="background: #fef3c7; border-left-color: #f59e0b;">
+                <h3>📋 입력된 답변 데이터 (각 질문당 1순위 ○, 2순위 △ 2개 선택)</h3>
+                <div style="font-family: monospace; background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <div>Q1: 4 (○), 2 (△)</div>
+                        <div>Q2: 4 (○), 3 (△)</div>
+                        <div>Q3: 4 (○), 2 (△)</div>
+                        <div>Q4: 4 (○), 2 (△)</div>
+                        <div>Q5: 2 (○), 1 (△)</div>
+                        <div>Q6: 4 (○), 3 (△)</div>
+                        <div>Q7: 4 (○), 3 (△)</div>
+                        <div>Q8: 4 (○), 2 (△)</div>
+                        <div>Q9: 4 (○), 2 (△)</div>
+                        <div>Q10: 4 (○), 2 (△)</div>
+                        <div>Q11: 4 (○), 2 (△)</div>
+                        <div>Q12: 4 (○), 5 (△)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box" style="background: #f0fdf4; border-left-color: #10b981;">
+                <h3>📊 예상 분석 결과 (점수 기반: 1순위 2점, 2순위 1점)</h3>
+                <ul>
+                    <li><strong>1형 (수익 정체·감소):</strong> 1점</li>
+                    <li><strong>2형 (수익 유지·불안정):</strong> 9점 ⭐ <span style="color: #10b981; font-weight: bold;">보조 단계</span></li>
+                    <li><strong>3형 (원장 과부하):</strong> 4점</li>
+                    <li><strong>4형 (수익 안정·확장 준비):</strong> 22점 ⭐ <span style="color: #2563eb; font-weight: bold;">주 단계</span></li>
+                    <li><strong>5형 (고수익·브랜드형):</strong> 1점</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <button class="btn-secondary" onclick="window.location.href='1.index-revenue.html'">
+                    새로운 진단 시작
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 1. 병원 수익 단계별 진단 시스템</p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
+        </footer>
+    </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        function runDemo() {
+            // 테스트 데이터 (4형이 주 단계, 2형이 보조 단계가 되도록)
+            // 각 답변은 "1순위2순위" 형식 (예: "42"는 1순위=4, 2순위=2)
+            const testData = ['42', '43', '42', '42', '21', '43', '43', '42', '42', '42', '42', '45'];
+
+            // 진단 일자 (현재 날짜)
+            const today = new Date();
+            const diagnosisDate = today.getFullYear() + '년 ' +
+                                  (today.getMonth() + 1) + '월 ' +
+                                  today.getDate() + '일';
+
+            // 세션 스토리지에 데이터 저장
+            sessionStorage.setItem('clinicName', '화이트 서울 치과');
+            sessionStorage.setItem('directorName', '임영일');
+            sessionStorage.setItem('region', '대전 중구');
+            sessionStorage.setItem('revenueDiagnosisDate', diagnosisDate);
+            sessionStorage.setItem('revenueAnswers', JSON.stringify(testData));
+
+            // 결과 페이지로 이동
+            window.location.href = '1.result-revenue.html';
+        }
+
+        // 페이지 로드 시 애니메이션
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.querySelector('.btn-primary');
+            button.style.animation = 'pulse 2s infinite';
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

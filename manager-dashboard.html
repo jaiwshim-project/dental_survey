@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매니저 대시보드 - 치과병원 진단 시스템</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dashboard-header p {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin: 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card h2 {
+            font-size: 1.3rem;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-card p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .btn-dashboard {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-dashboard:hover {
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            transform: translateY(-2px);
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-section h3 {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-stats {
+                flex-direction: column;
+            }
+        }
+
+        /* 비밀번호 인증 모달 */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .auth-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .auth-modal h2 {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .auth-modal p {
+            color: #6b7280;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .auth-modal input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 0.3em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .auth-modal input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .auth-modal button {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-modal button:hover {
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            transform: translateY(-2px);
+        }
+
+        .auth-error {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .dashboard-content {
+            display: none;
+        }
+
+        .dashboard-content.authenticated {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 비밀번호 인증 모달 -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <h2>🔐 매니저 인증</h2>
+            <p>매니저 대시보드에 접근하려면<br>비밀번호를 입력하세요.</p>
+            <input
+                type="password"
+                id="passwordInput"
+                placeholder="••••••"
+                maxlength="6"
+                autocomplete="off"
+            >
+            <button onclick="verifyPassword()">확인</button>
+            <p class="auth-error" id="authError">비밀번호가 올바르지 않습니다.</p>
+            <a href="index.html" style="display: inline-block; margin-top: 15px; color: #6b7280; text-decoration: none; font-size: 0.9rem;">
+                ← 메인으로 돌아가기
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-content" id="dashboardContent">
+    <div class="container">
+        <a href="index.html" class="back-button">← 메인으로 돌아가기</a>
+
+        <div class="dashboard-header">
+            <h1>🔐 매니저 대시보드</h1>
+            <p>치과병원 진단 시스템 관리 및 통계</p>
+        </div>
+
+        <main>
+            <!-- 상단 요약 통계 (컴팩트) -->
+            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <!-- 동적으로 채워질 통계 -->
+                </div>
+            </div>
+
+            <!-- 필터 및 검색 바 -->
+            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" placeholder="🔍 병원명 또는 원장명 검색..." style="width: 100%; padding: 10px 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+                    <select style="padding: 10px 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; cursor: pointer;">
+                        <option>전체 진단</option>
+                        <option>1번: 수익 단계별</option>
+                        <option>2번: 원장 스타일</option>
+                        <option>통합 완료</option>
+                    </select>
+                    <select style="padding: 10px 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; cursor: pointer;">
+                        <option>최근 7일</option>
+                        <option>최근 30일</option>
+                        <option>최근 3개월</option>
+                        <option>전체 기간</option>
+                    </select>
+                    <button style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: 600;">초기화</button>
+                </div>
+            </div>
+
+            <!-- 진단 목록 테이블 (메인) -->
+            <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                <h3 style="font-size: 1.2rem; color: #1f2937; margin-bottom: 20px;">📋 진단 목록</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <th style="padding: 12px; text-align: left; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">진단일</th>
+                                <th style="padding: 12px; text-align: left; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">병원명</th>
+                                <th style="padding: 12px; text-align: left; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">원장명</th>
+                                <th style="padding: 12px; text-align: left; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">지역</th>
+                                <th style="padding: 12px; text-align: center; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">인력</th>
+                                <th style="padding: 12px; text-align: center; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">1번 진단</th>
+                                <th style="padding: 12px; text-align: center; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">2번 진단</th>
+                                <th style="padding: 12px; text-align: center; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">이메일</th>
+                                <th style="padding: 12px; text-align: center; font-size: 0.85rem; color: #1f2937; white-space: nowrap;">상세</th>
+                            </tr>
+                        </thead>
+                        <tbody id="diagnosisTableBody">
+                            <!-- 동적으로 채워질 내용 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
+                    <button style="padding: 8px 12px; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer;">‹</button>
+                    <button style="padding: 8px 12px; border: 1px solid #2563eb; background: #2563eb; color: white; border-radius: 6px; font-weight: 600;">1</button>
+                    <button style="padding: 8px 12px; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer;">2</button>
+                    <button style="padding: 8px 12px; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer;">3</button>
+                    <button style="padding: 8px 12px; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer;">›</button>
+                </div>
+            </div>
+        </main>
+
+        <footer style="margin-top: 40px;">
+            <p>&copy; 2026 치과병원 컨설팅 솔루션 | 매니저 대시보드</p>
+        </footer>
+    </div>
+    </div>
+
+    <!-- 상세 정보 모달 -->
+    <div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 3000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 40px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 id="detailTitle" style="color: #1f2937; font-size: 1.5rem; margin: 0;"></h2>
+                <button onclick="closeDetail()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">✕</button>
+            </div>
+
+            <div id="detailContent" style="color: #4b5563; line-height: 1.8;">
+                <!-- 동적으로 채워질 내용 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 비밀번호 설정 (963314)
+        const MANAGER_PASSWORD = '963314';
+        const AUTH_SESSION_KEY = 'managerAuthenticated';
+
+        // 실제 진단 데이터를 저장할 변수
+        let diagnosisData = [];
+
+        // 테스트 데이터 (개발용 - 실제 데이터가 없을 때만 사용)
+        const testData = {
+            1: {
+                clinicName: '화이트서울치과',
+                directorName: '임영일',
+                region: '대전 중구',
+                staff: '의사 1명 / 간호사 1명 / 상담사 1명',
+                date: '2026-01-07',
+                diagnosis1: {
+                    type: '3형 (원장 과부하)',
+                    score: 18,
+                    secondary: '1형 (수익 정체·감소)',
+                    description: '원장님이 상담과 진료를 모두 담당하여 과부하 상태이며, 이로 인해 환자 이탈도 발생하고 있습니다.',
+                    scores: [12, 10, 18, 8, 6] // 1형, 2형, 3형, 4형, 5형
+                },
+                diagnosis2: {
+                    type: 'D형 (수익·경영형)',
+                    score: 24,
+                    secondary: 'A형 (결단·속도형)',
+                    description: 'ROI와 수익성을 중시하면서도 빠른 실행을 선호하는 균형잡힌 스타일입니다.',
+                    scores: [18, 12, 10, 24, 14] // A형, B형, C형, D형, E형
+                }
+            },
+            2: {
+                clinicName: '강남브라이트치과',
+                directorName: '김수진',
+                region: '서울 강남',
+                staff: '의사 2명 / 간호사 3명 / 상담사 2명',
+                date: '2026-01-07',
+                diagnosis1: {
+                    type: '5형 (고수익·브랜드형)',
+                    score: 22,
+                    secondary: '4형 (수익 안정·확장 준비)',
+                    description: '환자 만족도가 높고 신뢰 기반이 구축되어 있으며, 확장을 준비할 수 있는 안정적인 단계입니다.',
+                    scores: [6, 8, 10, 18, 22]
+                },
+                diagnosis2: {
+                    type: 'E형 (환자·신뢰형)',
+                    score: 20,
+                    secondary: 'C형 (팀·교육형)',
+                    description: '환자 경험과 관계를 중시하며, 직원 교육에도 관심이 높은 스타일입니다.',
+                    scores: [10, 8, 16, 12, 20]
+                }
+            },
+            3: {
+                clinicName: '스마일365치과',
+                directorName: '박민수',
+                region: '부산 해운대',
+                staff: '의사 1명 / 간호사 2명 / 상담사 1명',
+                date: '2026-01-07',
+                diagnosis1: {
+                    type: '2형 (수익 유지·불안정)',
+                    score: 16,
+                    secondary: '1형 (수익 정체·감소)',
+                    description: '월별 매출 변동성이 크고 상담 결과가 일정하지 않아 불안정한 상태입니다.',
+                    scores: [14, 16, 10, 8, 6]
+                },
+                diagnosis2: null
+            },
+            4: {
+                clinicName: '연세프라임치과',
+                directorName: '이준호',
+                region: '인천 송도',
+                staff: '의사 3명 / 간호사 4명 / 상담사 3명',
+                date: '2026-01-06',
+                diagnosis1: {
+                    type: '4형 (수익 안정·확장 준비)',
+                    score: 26,
+                    secondary: '5형 (고수익·브랜드형)',
+                    description: '시스템이 안정적으로 구축되어 있고 확장을 위한 준비가 되어 있는 단계입니다.',
+                    scores: [6, 10, 12, 26, 20]
+                },
+                diagnosis2: {
+                    type: 'B형 (구조·안정형)',
+                    score: 28,
+                    secondary: 'D형 (수익·경영형)',
+                    description: '기준과 시스템화를 중시하며 경영 지표를 체계적으로 관리하는 스타일입니다.',
+                    scores: [12, 28, 10, 22, 14]
+                }
+            },
+            5: {
+                clinicName: '서울우리치과',
+                directorName: '최은영',
+                region: '서울 마포',
+                staff: '의사 1명 / 간호사 1명 / 상담사 0명',
+                date: '2026-01-06',
+                diagnosis1: {
+                    type: '1형 (수익 정체·감소)',
+                    score: 20,
+                    secondary: '2형 (수익 유지·불안정)',
+                    description: '환자가 지속적으로 감소하고 있으며 상담에서 선택받을 이유를 잃어가고 있습니다.',
+                    scores: [20, 16, 12, 8, 6]
+                },
+                diagnosis2: {
+                    type: 'A형 (결단·속도형)',
+                    score: 22,
+                    secondary: 'E형 (환자·신뢰형)',
+                    description: '빠른 실행을 선호하면서도 환자와의 관계를 중시하는 스타일입니다.',
+                    scores: [22, 10, 12, 14, 18]
+                }
+            }
+        };
+
+        // 상세보기 함수 - 통합 결과 페이지로 이동
+        function showDetail(index) {
+            // 최신순으로 정렬된 데이터에서 가져오기
+            const sortedData = [...diagnosisData].sort((a, b) => b.timestamp - a.timestamp);
+            const data = sortedData[index];
+            if (!data) return;
+
+            // sessionStorage에 선택한 진단 데이터 저장
+            sessionStorage.setItem('selectedDiagnosis', JSON.stringify(data));
+
+            // 통합 결과 페이지로 이동 (새 탭)
+            window.open('manager-view-report.html', '_blank');
+        }
+
+        // 차트 인스턴스 저장
+        let chartInstances = [];
+
+        // 상세보기 닫기
+        function closeDetail() {
+            document.getElementById('detailModal').style.display = 'none';
+            // 모든 차트 인스턴스 제거
+            chartInstances.forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            chartInstances = [];
+        }
+
+        // 차트 생성 시 인스턴스 저장
+        function drawChart1(id, diagnosis) {
+            const ctx = document.getElementById(`chart1_${id}`);
+            if (!ctx) return;
+
+            const labels = ['1형\n정체·감소', '2형\n유지·불안정', '3형\n원장과부하', '4형\n안정·확장', '5형\n브랜드형'];
+
+            const primaryIndex = diagnosis.scores.indexOf(Math.max(...diagnosis.scores));
+            const sortedScores = [...diagnosis.scores].sort((a, b) => b - a);
+            const secondaryScore = sortedScores[1];
+            const secondaryIndex = diagnosis.scores.indexOf(secondaryScore);
+
+            const pointBackgroundColors = diagnosis.scores.map((score, index) => {
+                if (index === primaryIndex) return '#2563eb';
+                if (index === secondaryIndex) return '#10b981';
+                return '#9ca3af';
+            });
+
+            const pointRadius = diagnosis.scores.map((score, index) => {
+                if (index === primaryIndex || index === secondaryIndex) return 6;
+                return 4;
+            });
+
+            const chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '수익 단계별 점수',
+                        data: diagnosis.scores,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        pointBackgroundColor: pointBackgroundColors,
+                        pointBorderColor: pointBackgroundColors,
+                        pointBorderWidth: 2,
+                        pointRadius: pointRadius,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '병원 수익 단계별 5유형 분석',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: Math.max(...diagnosis.scores) + 5,
+                            ticks: { stepSize: 5 }
+                        }
+                    }
+                }
+            });
+            chartInstances.push(chart);
+        }
+
+        function drawChart2(id, diagnosis) {
+            const ctx = document.getElementById(`chart2_${id}`);
+            if (!ctx) return;
+
+            const labels = ['A형\n결단·속도', 'B형\n구조·안정', 'C형\n팀·교육', 'D형\n수익·경영', 'E형\n환자·신뢰'];
+
+            const primaryIndex = diagnosis.scores.indexOf(Math.max(...diagnosis.scores));
+            const sortedScores = [...diagnosis.scores].sort((a, b) => b - a);
+            const secondaryScore = sortedScores[1];
+            const secondaryIndex = diagnosis.scores.indexOf(secondaryScore);
+
+            const pointBackgroundColors = diagnosis.scores.map((score, index) => {
+                if (index === primaryIndex) return '#8b5cf6';
+                if (index === secondaryIndex) return '#10b981';
+                return '#9ca3af';
+            });
+
+            const pointRadius = diagnosis.scores.map((score, index) => {
+                if (index === primaryIndex || index === secondaryIndex) return 6;
+                return 4;
+            });
+
+            const chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '원장 스타일 점수',
+                        data: diagnosis.scores,
+                        fill: true,
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        borderColor: '#8b5cf6',
+                        borderWidth: 2,
+                        pointBackgroundColor: pointBackgroundColors,
+                        pointBorderColor: pointBackgroundColors,
+                        pointBorderWidth: 2,
+                        pointRadius: pointRadius,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '원장 스타일 5유형 분석',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: Math.max(...diagnosis.scores) + 5,
+                            ticks: { stepSize: 5 }
+                        }
+                    }
+                }
+            });
+            chartInstances.push(chart);
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDetail();
+            }
+        });
+
+        // 페이지 로드 시 인증 확인
+        window.addEventListener('DOMContentLoaded', function() {
+            // 세션에 인증 정보가 있는지 확인
+            const isAuthenticated = sessionStorage.getItem(AUTH_SESSION_KEY);
+
+            if (isAuthenticated === 'true') {
+                // 이미 인증되었으면 대시보드 표시
+                showDashboard();
+            } else {
+                // 비밀번호 입력에 포커스
+                document.getElementById('passwordInput').focus();
+            }
+
+            // Enter 키로도 확인 가능하도록
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyPassword();
+                }
+            });
+        });
+
+        // 비밀번호 확인 함수
+        function verifyPassword() {
+            const input = document.getElementById('passwordInput');
+            const password = input.value.trim();
+            const errorMsg = document.getElementById('authError');
+
+            if (password === MANAGER_PASSWORD) {
+                // 비밀번호 일치
+                sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
+                showDashboard();
+            } else {
+                // 비밀번호 불일치
+                errorMsg.style.display = 'block';
+                input.value = '';
+                input.focus();
+
+                // 입력 필드 흔들기 효과
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // 대시보드 표시
+        function showDashboard() {
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('dashboardContent').classList.add('authenticated');
+
+            // 대시보드 데이터 로드
+            loadDashboardData();
+        }
+
+        // 대시보드 데이터 로드
+        function loadDashboardData() {
+            // localStorage에서 진단 기록 가져오기
+            const history = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
+
+            // 실제 데이터가 없으면 테스트 데이터 사용
+            if (history.length === 0) {
+                console.log('실제 데이터가 없어 테스트 데이터를 사용합니다.');
+                diagnosisData = convertTestDataToArray();
+            } else {
+                diagnosisData = history;
+            }
+
+            // 통계 계산
+            updateStatistics();
+
+            // 테이블 업데이트
+            updateTable();
+        }
+
+        // 테스트 데이터를 배열 형식으로 변환
+        function convertTestDataToArray() {
+            const arr = [];
+            for (let key in testData) {
+                const item = testData[key];
+                arr.push({
+                    id: 'test_' + key,
+                    timestamp: new Date(item.date).getTime(),
+                    clinicName: item.clinicName,
+                    directorName: item.directorName,
+                    region: item.region,
+                    doctorCount: item.staff.match(/의사 (\d+)/)[1],
+                    nurseCount: item.staff.match(/간호사 (\d+)/)[1],
+                    counselorCount: item.staff.match(/상담사 (\d+)/)[1],
+                    date: item.date,
+                    diagnosis1: item.diagnosis1 ? {
+                        answers: [],
+                        scores: item.diagnosis1.scores,
+                        primaryType: {
+                            type: item.diagnosis1.type.match(/(\d)형/)[1],
+                            name: item.diagnosis1.type.match(/\((.*)\)/)[1],
+                            score: item.diagnosis1.score
+                        },
+                        secondaryType: {
+                            type: item.diagnosis1.secondary.match(/(\d)형/)[1],
+                            name: item.diagnosis1.secondary.match(/\((.*)\)/)[1]
+                        }
+                    } : null,
+                    diagnosis2: item.diagnosis2 ? {
+                        answers: [],
+                        scores: item.diagnosis2.scores,
+                        primaryType: {
+                            type: item.diagnosis2.type.match(/([A-E])형/)[1],
+                            name: item.diagnosis2.type.match(/\((.*)\)/)[1],
+                            score: item.diagnosis2.score
+                        },
+                        secondaryType: {
+                            type: item.diagnosis2.secondary.match(/([A-E])형/)[1],
+                            name: item.diagnosis2.secondary.match(/\((.*)\)/)[1]
+                        }
+                    } : null
+                });
+            }
+            return arr;
+        }
+
+        // 통계 업데이트
+        function updateStatistics() {
+            const total = diagnosisData.length;
+
+            // 오늘 날짜 (YYYY-MM-DD 형식)
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = diagnosisData.filter(d => d.date && d.date.includes(today)).length;
+
+            // 1번 진단 완료 수
+            const diagnosis1Count = diagnosisData.filter(d => d.diagnosis1 !== null).length;
+
+            // 2번 진단 완료 수
+            const diagnosis2Count = diagnosisData.filter(d => d.diagnosis2 !== null).length;
+
+            // 통합 완료 수 (둘 다 완료)
+            const integratedCount = diagnosisData.filter(d => d.diagnosis1 !== null && d.diagnosis2 !== null).length;
+
+            // HTML 업데이트
+            const statsHTML = `
+                <div style="text-align: center; flex: 1; min-width: 100px;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #2563eb;">${total}</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">총 진단 수</div>
+                </div>
+                <div style="height: 40px; width: 1px; background: #e5e7eb;"></div>
+                <div style="text-align: center; flex: 1; min-width: 100px;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #10b981;">${todayCount}</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">오늘 진단</div>
+                </div>
+                <div style="height: 40px; width: 1px; background: #e5e7eb;"></div>
+                <div style="text-align: center; flex: 1; min-width: 100px;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #8b5cf6;">${diagnosis1Count}</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">1번 진단</div>
+                </div>
+                <div style="height: 40px; width: 1px; background: #e5e7eb;"></div>
+                <div style="text-align: center; flex: 1; min-width: 100px;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #f59e0b;">${diagnosis2Count}</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">2번 진단</div>
+                </div>
+                <div style="height: 40px; width: 1px; background: #e5e7eb;"></div>
+                <div style="text-align: center; flex: 1; min-width: 100px;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #ef4444;">${integratedCount}</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">통합 완료</div>
+                </div>
+            `;
+
+            document.querySelector('.dashboard-content main > div:first-child > div').innerHTML = statsHTML;
+        }
+
+        // 테이블 업데이트
+        function updateTable() {
+            const tbody = document.getElementById('diagnosisTableBody');
+
+            if (diagnosisData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="padding: 40px; text-align: center; color: #6b7280;">
+                            아직 등록된 진단 기록이 없습니다.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 최신순으로 정렬
+            const sortedData = [...diagnosisData].sort((a, b) => b.timestamp - a.timestamp);
+
+            let html = '';
+            sortedData.forEach((item, index) => {
+                const staff = `의${item.doctorCount}/간${item.nurseCount}/상${item.counselorCount || 0}`;
+
+                // 1번 진단 뱃지
+                let diag1Badge = '<span style="background: #e5e7eb; color: #6b7280; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">미완료</span>';
+                if (item.diagnosis1) {
+                    const type = item.diagnosis1.primaryType.type;
+                    const score = item.diagnosis1.primaryType.score;
+                    const colors = {
+                        '1': 'background: #fee2e2; color: #991b1b;',
+                        '2': 'background: #fef3c7; color: #92400e;',
+                        '3': 'background: #dbeafe; color: #1e40af;',
+                        '4': 'background: #dbeafe; color: #1e40af;',
+                        '5': 'background: #d1fae5; color: #065f46;'
+                    };
+                    diag1Badge = `<span style="${colors[type]} padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${type}형(${score}점)</span>`;
+                }
+
+                // 2번 진단 뱃지
+                let diag2Badge = '<span style="background: #e5e7eb; color: #6b7280; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">미완료</span>';
+                if (item.diagnosis2) {
+                    const type = item.diagnosis2.primaryType.type;
+                    const score = item.diagnosis2.primaryType.score;
+                    const colors = {
+                        'A': 'background: #ede9fe; color: #6b21a8;',
+                        'B': 'background: #d1fae5; color: #065f46;',
+                        'C': 'background: #fef3c7; color: #92400e;',
+                        'D': 'background: #ede9fe; color: #6b21a8;',
+                        'E': 'background: #fee2e2; color: #991b1b;'
+                    };
+                    diag2Badge = `<span style="${colors[type]} padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${type}형(${score}점)</span>`;
+                }
+
+                // 이메일 요청 여부
+                let emailBadge = '<span style="color: #9ca3af; font-size: 0.8rem;">-</span>';
+                if (item.emailRequests) {
+                    const hasEmail1 = item.emailRequests.diagnosis1 ? true : false;
+                    const hasEmail2 = item.emailRequests.diagnosis2 ? true : false;
+
+                    if (hasEmail1 && hasEmail2) {
+                        emailBadge = '<span style="background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">1+2</span>';
+                    } else if (hasEmail1) {
+                        emailBadge = '<span style="background: #2563eb; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">1번</span>';
+                    } else if (hasEmail2) {
+                        emailBadge = '<span style="background: #8b5cf6; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">2번</span>';
+                    }
+                }
+
+                html += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px; font-size: 0.85rem; color: #4b5563;">${item.date || '-'}</td>
+                        <td style="padding: 12px; font-size: 0.85rem; color: #1f2937; font-weight: 600;">${item.clinicName}</td>
+                        <td style="padding: 12px; font-size: 0.85rem; color: #4b5563;">${item.directorName}</td>
+                        <td style="padding: 12px; font-size: 0.85rem; color: #6b7280;">${item.region || '-'}</td>
+                        <td style="padding: 12px; text-align: center; font-size: 0.8rem; color: #6b7280;">${staff}</td>
+                        <td style="padding: 12px; text-align: center;">${diag1Badge}</td>
+                        <td style="padding: 12px; text-align: center;">${diag2Badge}</td>
+                        <td style="padding: 12px; text-align: center;">${emailBadge}</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <button onclick="showDetail(${index})" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;">보기</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // CSS 애니메이션 추가
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -326,9 +326,65 @@
             content: "🔐 ";
             font-size: 0.8rem;
         }
+
+        /* 수익 진단 샘플 버튼 (푸터용) */
+        .revenue-sample-btn {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.8);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .revenue-sample-btn:hover {
+            background: rgba(37, 99, 235, 1);
+            color: rgba(255, 255, 255, 1);
+        }
+
+        /* 스타일 진단 샘플 버튼 (푸터용) */
+        .type-sample-btn {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.8);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .type-sample-btn:hover {
+            background: rgba(139, 92, 246, 1);
+            color: rgba(255, 255, 255, 1);
+        }
     </style>
 </head>
 <body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <span>🏥</span>
+                <span>치과병원 통합 진단</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html" class="active">홈</a></li>
+                <li><a href="1.index-revenue.html">진단 시작</a></li>
+                <li><a href="1.test-demo-revenue.html">샘플 보기</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
         <!-- 히어로 섹션 -->
         <div class="hero-section">
@@ -442,6 +498,25 @@
             </div>
         </main>
 
+        <script>
+            // 모바일 메뉴 토글
+            function toggleMenu() {
+                const menu = document.getElementById('navbarMenu');
+                menu.classList.toggle('active');
+            }
+
+            // 메뉴 외부 클릭 시 닫기
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('navbarMenu');
+                const toggle = document.querySelector('.navbar-toggle');
+                const navbar = document.querySelector('.navbar');
+
+                if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+        </script>
+
         <footer style="text-align: center; padding: 30px 20px; margin-top: 60px; border-top: 2px solid #e5e7eb;">
             <div style="margin-bottom: 20px;">
                 <img src="로고-덴탈클리닉파인더.jpg" alt="덴탈클리닉파인더" style="max-width: 200px; height: auto;">
@@ -452,7 +527,11 @@
             <p style="margin: 10px 0; color: #9ca3af; font-size: 0.85rem;">
                 &copy; 2026 치과병원 컨설팅 솔루션 | 통합 진단 시스템
             </p>
-            <a href="manager-dashboard.html" class="manager-dashboard-btn">매니저 대시보드</a>
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <a href="manager-dashboard.html" class="manager-dashboard-btn">매니저 대시보드</a>
+                <a href="1.result-revenue.html" class="revenue-sample-btn">📊 1. 수익 진단 샘플</a>
+                <a href="2.result-type.html" class="type-sample-btn">🏥 2. 스타일 진단 샘플</a>
+            </div>
         </footer>
     </div>
 </body>

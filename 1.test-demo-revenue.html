@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>진단 시연 - 수익 단계별 진단</title>
+    <title>통합 진단 시스템 샘플</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="revenue-theme">
     <!-- 네비게이션 바 -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="1.index-revenue.html" class="navbar-brand">
-                <span>💰</span>
-                <span>1. 병원 수익 단계별 진단</span>
+            <a href="index.html" class="navbar-brand">
+                <span>🏥</span>
+                <span>통합 진단 샘플</span>
             </a>
 
             <button class="navbar-toggle" onclick="toggleMenu()">
@@ -20,36 +20,44 @@
             </button>
 
             <ul class="navbar-menu" id="navbarMenu">
-                <li><a href="1.index-revenue.html">홈</a></li>
+                <li><a href="index.html">홈</a></li>
                 <li><a href="1.index-revenue.html#start">진단 시작</a></li>
-                <li><a href="1.test-demo-revenue.html" class="active">시연 보기</a></li>
-                <li><a href="2.index-type.html">원장 스타일 진단</a></li>
+                <li><a href="1.test-demo-revenue.html" class="active">샘플 보기</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <header>
-            <h1>1. 병원 수익 단계별 5유형 진단 시스템</h1>
-            <p class="subtitle">테스트 시연 모드</p>
+            <h1>통합 진단 시스템 샘플</h1>
+            <p class="subtitle">1. 병원 수익 단계별 진단 + 2. 원장 스타일 진단</p>
         </header>
 
         <main>
             <div class="info-box">
                 <h3>🎯 시연 안내</h3>
-                <p>테스트 병원 데이터를 사용하여 자동으로 결과를 생성합니다.</p>
+                <p>임영일 원장(화이트 서울 치과)의 통합 진단 데이터를 사용하여 자동으로 결과를 생성합니다.</p>
                 <ul>
                     <li><strong>병원명:</strong> 화이트 서울 치과</li>
                     <li><strong>원장명:</strong> 임영일 원장</li>
                     <li><strong>지역:</strong> 대전 중구</li>
-                    <li><strong>응답 데이터:</strong> 12문항 사전 입력 완료</li>
+                    <li><strong>의사 수:</strong> 1명 | <strong>간호사 수:</strong> 1명 | <strong>상담사 수:</strong> 1명</li>
+                    <li><strong>1. 병원 수익 진단:</strong> 12문항 응답 완료</li>
+                    <li><strong>2. 원장 스타일 진단:</strong> 25문항 응답 완료</li>
                 </ul>
             </div>
 
             <div style="text-align: center; margin: 40px 0;">
                 <button class="btn-primary" onclick="runDemo()" style="font-size: 1.2rem; padding: 20px 50px;">
-                    🚀 진단 결과 보기
+                    🚀 1. 병원 수익 진단 결과 보기
                 </button>
+                <p style="color: #6b7280; font-size: 0.95rem; margin-top: 15px;">
+                    * 2. 원장 스타일 진단 결과는 별도로 확인 가능합니다
+                </p>
+            </div>
+
+            <div class="info-box" style="background: #dbeafe; border-left-color: #2563eb;">
+                <h2 style="color: #2563eb; font-size: 1.5rem; margin-bottom: 15px;">📊 1. 병원 수익 단계별 진단</h2>
             </div>
 
             <div class="info-box" style="background: #fef3c7; border-left-color: #f59e0b;">
@@ -83,8 +91,57 @@
                 </ul>
             </div>
 
+            <!-- 2. 원장 스타일 진단 섹션 -->
+            <div class="info-box" style="background: #ede9fe; border-left-color: #8b5cf6; margin-top: 40px;">
+                <h2 style="color: #8b5cf6; font-size: 1.5rem; margin-bottom: 15px;">🏥 2. 원장 스타일 진단</h2>
+            </div>
+
+            <div class="info-box" style="background: #fef3c7; border-left-color: #f59e0b;">
+                <h3>📋 입력된 답변 데이터 (각 질문당 1순위, 2순위 선택)</h3>
+                <div style="font-family: monospace; background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; font-size: 0.9rem;">
+                        <div>Q1: 2,5</div>
+                        <div>Q2: 4,5</div>
+                        <div>Q3: 2,3</div>
+                        <div>Q4: 5,1</div>
+                        <div>Q5: 5,3</div>
+                        <div>Q6: 5,2</div>
+                        <div>Q7: 4,3</div>
+                        <div>Q8: 4,5</div>
+                        <div>Q9: 2,3</div>
+                        <div>Q10: 4,2</div>
+                        <div>Q11: 4,5</div>
+                        <div>Q12: 1,5</div>
+                        <div>Q13: 4,5</div>
+                        <div>Q14: 4,5</div>
+                        <div>Q15: 2,3</div>
+                        <div>Q16: 1,4</div>
+                        <div>Q17: 1,4</div>
+                        <div>Q18: 4,5</div>
+                        <div>Q19: 2,5</div>
+                        <div>Q20: 2,5</div>
+                        <div>Q21: 1,4</div>
+                        <div>Q22: 2,4</div>
+                        <div>Q23: 4,2</div>
+                        <div>Q24: 4,5</div>
+                        <div>Q25: 1,5</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box" style="background: #f0fdf4; border-left-color: #10b981;">
+                <h3>📊 예상 분석 결과</h3>
+                <ul>
+                    <li><strong>1형 (결단·속도형):</strong> 11점</li>
+                    <li><strong>2형 (구조·안정형):</strong> 17점</li>
+                    <li><strong>3형 (팀·교육형):</strong> 5점</li>
+                    <li><strong>4형 (수익·경영형):</strong> 24점 ⭐ <span style="color: #8b5cf6; font-weight: bold;">주 유형</span></li>
+                    <li><strong>5형 (환자·신뢰형):</strong> 18점 🔸 <span style="color: #10b981; font-weight: bold;">보조 유형</span></li>
+                </ul>
+            </div>
+
             <div style="text-align: center; margin: 40px 0;">
-                <button class="btn-secondary" onclick="window.location.href='1.index-revenue.html'">
+                <button class="btn-secondary" onclick="window.location.href='index.html'">
                     새로운 진단 시작
                 </button>
             </div>
@@ -98,7 +155,7 @@
                 심재우 대표 | 010-2397-5734 | jaiwshim@gmail.com
             </p>
             <p style="margin: 10px 0; color: #9ca3af; font-size: 0.85rem;">
-                &copy; 2026 치과병원 컨설팅 솔루션 | 1. 병원 수익 단계별 진단 시스템
+                &copy; 2026 치과병원 컨설팅 솔루션 | 통합 진단 시스템 샘플
             </p>
             <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
         </footer>

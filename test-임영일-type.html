@@ -8,6 +8,26 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="type-theme">
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <span>🏥</span>
+                <span>2. 원장 스타일 진단 결과</span>
+            </a>
+
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="2.index-type.html#start">진단 시작</a></li>
+                <li><a href="2.test-demo-type.html">샘플 보기</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="result-header">
             <h1 style="font-size: 1.8rem; margin-bottom: 8px;">화이트서울치과 임영일 원장</h1>
@@ -113,8 +133,28 @@
             <p style="margin: 10px 0; color: #9ca3af; font-size: 0.85rem;">
                 &copy; 2026 치과병원 컨설팅 솔루션 | 2. 원장 스타일 진단 시스템
             </p>
+            <a href="manager-dashboard.html" class="manager-dashboard-btn" style="display: inline-block; background: rgba(31, 41, 55, 0.8); color: rgba(255, 255, 255, 0.7); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-top: 10px;">🔐 매니저 대시보드</a>
         </footer>
     </div>
+
+    <script>
+        // 모바일 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navbarMenu');
+            const toggle = document.querySelector('.navbar-toggle');
+            const navbar = document.querySelector('.navbar');
+
+            if (menu && toggle && navbar && !navbar.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
 
     <script src="js/2.data-type.js"></script>
     <script src="js/2.analysis-type.js"></script>
